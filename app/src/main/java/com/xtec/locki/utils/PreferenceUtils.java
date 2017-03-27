@@ -148,4 +148,24 @@ public  class PreferenceUtils {
     }
 
 
+    public static boolean putBoolean(Context context, String key, boolean value, boolean multi_process) {
+        SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(key, value);
+        return editor.commit();
+    }
+
+    /**
+     *
+     * @param context
+     * @param key
+     * @param multi_process 是否跨进程
+     * @param defaultValue 默认值
+     * @return
+     */
+    public static boolean getBoolean(Context context, String key,boolean multi_process,boolean defaultValue) {
+        SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);
+        return settings.getBoolean(key,false);
+    }
+
 }

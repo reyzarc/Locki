@@ -47,8 +47,15 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 break;
             case R.id.rb_number_pwd://数字密码解锁
             default:
-               PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER, true);
+                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER, true);
                 break;
         }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 }

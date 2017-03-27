@@ -7,10 +7,12 @@ import android.os.Message;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.widget.FastDialog;
 
@@ -28,6 +30,8 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
 
     private LinearLayout llFingerprint;
 
+    private String packageName;
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -42,6 +46,8 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_fingerprint);
+
+        packageName = getIntent().getStringExtra(Constant.PACKAGE_NAME);
 
         TextView tvLoginByPwd = (TextView) findViewById(R.id.tv_login_by_pwd);
         llFingerprint = (LinearLayout) findViewById(R.id.ll_fingerprint);
@@ -130,7 +136,12 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
         @Override
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
-
+            Log.e("reyzarc","指纹认证成功....");
+            //发送认证成功的广播
+            Intent intent = new Intent();
+            intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
+            intent.putExtra(Constant.PACKAGE_NAME,packageName);
+            sendBroadcast(intent);
             finish();
             overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
         }
@@ -142,22 +153,6 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode==111){
-            if(data.getStringExtra("result").equals("login_success")){
-                //登陆成功
-                gotoMainActivity();
-            }
-        }
-    }
-
-    private void gotoMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
-        finish();
-    }
 
     @Override
     public void onBackPressed() {
