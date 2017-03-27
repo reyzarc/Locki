@@ -3,6 +3,7 @@
     package="com.xtec.locki" >
 
     <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
 
     <application
         android:allowBackup="true"
@@ -33,6 +34,7 @@
             android:resource="@xml/accessibility" />
         </service>
         <activity android:name=".activity.LockActivity"/>
+        <activity android:name=".activity.UnlockByFingerprintActivity"/>
 
     </application>
 

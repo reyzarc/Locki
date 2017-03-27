@@ -10,6 +10,7 @@ import android.widget.RadioGroup;
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.service.LockService;
+import com.xtec.locki.utils.PreferenceUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,21 +33,21 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         ButterKnife.bind(this);
         startService(new Intent(this, LockService.class));
         radioGroup.setOnCheckedChangeListener(this);
-
+        PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
         switch (i) {
             case R.id.rb_fingerprint://指纹解锁
-                LockService.PreferencesUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
+                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
                 break;
             case R.id.rb_gesture_pwd://手势密码解锁
-                LockService.PreferencesUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE, true);
+                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE, true);
                 break;
             case R.id.rb_number_pwd://数字密码解锁
             default:
-                LockService.PreferencesUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER, true);
+               PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER, true);
                 break;
         }
     }
