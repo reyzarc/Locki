@@ -38,8 +38,14 @@
         </service>
 
         <activity android:name=".activity.LockActivity"/>
+        <activity android:name=".activity.CreateGestureActivity"/>
         <activity
             android:name=".activity.UnlockByFingerprintActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"/>
+
+        <activity
+            android:name=".activity.UnlockByGestureActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"/>
 

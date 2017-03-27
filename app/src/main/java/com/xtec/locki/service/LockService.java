@@ -15,8 +15,6 @@ import com.xtec.locki.activity.UnlockByGestureActivity;
 import com.xtec.locki.activity.UnlockByNumberActivity;
 import com.xtec.locki.utils.PreferenceUtils;
 
-import rx.subscriptions.CompositeSubscription;
-
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICKED;
@@ -29,8 +27,9 @@ import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICK
 public class LockService extends AccessibilityService {
     private CharSequence mWindowClassName;
     private String mCurrentPackage;
+    private MyBroadcastReceiver mReceiver;
+    private String mTargetPackage = "com.tencent.mm";
 
-    private CompositeSubscription mCompositeSubscription;
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         int type=event.getEventType();
@@ -38,11 +37,13 @@ public class LockService extends AccessibilityService {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
                 mWindowClassName = event.getClassName();
                 mCurrentPackage = event.getPackageName()==null?"":event.getPackageName().toString();
-                Log.e("reyzarc","------------->"+mCurrentPackage);
-                if(TextUtils.equals("com.xtec.timeline",mCurrentPackage)&&!PreferenceUtils.getBoolean(this,Constant.UNLOCK_SUCCESS,true,false)){
+                //判断包名是否在加锁列表里,如果在,则继续判断是否已经解锁,如果锁过期,也需要重新解锁,失效时间为2分钟
+                Long currentTime = System.currentTimeMillis();
+                Log.e("reyzarc","时间差为---->"+currentTime+"------->"+PreferenceUtils.getLong(this,mCurrentPackage));
+                if(TextUtils.equals(mTargetPackage,mCurrentPackage)&&!PreferenceUtils.getBoolean(this,Constant.UNLOCK_SUCCESS,true,false)&& System.currentTimeMillis()-PreferenceUtils.getLong(this,mCurrentPackage)>2*60*1000){
                     Intent intent = new Intent();
                     intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(Constant.PACKAGE_NAME,"com.xtec.timeline");
+                    intent.putExtra(Constant.PACKAGE_NAME,mTargetPackage);
                     switch (PreferenceUtils.getString(this, Constant.LOCK_METHOD,true)){
                         case Constant.FINGERPRINT://指纹
                             intent.setClass(this,UnlockByFingerprintActivity.class);
@@ -73,28 +74,56 @@ public class LockService extends AccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("reyzarc","onCreate is running....");
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constant.ACTION_UNLOCK_SUCCESS);
-        registerReceiver(new MyBroadcastReceiver(),filter);
-    }
+        mReceiver = new MyBroadcastReceiver();
+        registerReceiver(mReceiver,filter);
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("reyzarc","onStartCommand is running....");
+        IntentFilter mScreenOnFilter = new IntentFilter("android.intent.action.SCREEN_ON");
+        registerReceiver(mScreenOReceiver, mScreenOnFilter);
 
-
-        return super.onStartCommand(intent, flags, startId);
+        /* 注册机器锁屏时的广播 */
+        IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
+        registerReceiver(mScreenOReceiver, mScreenOffFilter);
     }
 
     private class MyBroadcastReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            String packageName  = intent.getStringExtra(Constant.PACKAGE_NAME);
             if(!TextUtils.isEmpty(action)&&TextUtils.equals(action,Constant.ACTION_UNLOCK_SUCCESS)){
-                Log.e("reyzarc","解锁成功....."+intent.getStringExtra(Constant.PACKAGE_NAME));
+                Log.e("reyzarc","解锁成功....."+packageName);
                 PreferenceUtils.putBoolean(LockService.this,Constant.UNLOCK_SUCCESS,true,true);
+                //保存时间,以当前加锁应用的包名为key
+                PreferenceUtils.putLong(LockService.this,packageName, System.currentTimeMillis());
             }
         }
+    }
+
+    /**
+     * 锁屏的管理类叫KeyguardManager，
+     * 通过调用其内部类KeyguardLockmKeyguardLock的对象的disableKeyguard方法可以取消系统锁屏，
+     * newKeyguardLock的参数用于标识是谁隐藏了系统锁屏
+     */
+    private BroadcastReceiver mScreenOReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals("android.intent.action.SCREEN_ON")) {//亮屏
+                Log.e("reyzarc","—— SCREEN_ON ——");
+            } else if (action.equals("android.intent.action.SCREEN_OFF")) {//熄屏
+                //将锁重置为未解锁状态
+                PreferenceUtils.putBoolean(LockService.this,Constant.UNLOCK_SUCCESS,false,true);
+                Log.e("reyzarc","—— SCREEN_OFF ——");
+            }
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mReceiver);
     }
 }

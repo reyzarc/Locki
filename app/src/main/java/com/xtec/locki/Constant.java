@@ -34,4 +34,15 @@ public class Constant {
      * 解锁成功的广播的action
      */
     public static final String ACTION_UNLOCK_SUCCESS = "action_unlock_success";
+    /**
+     * 解锁时间
+     */
+    public static final String UNLOCK_DATE = "unlock_date";
+
+    //*/ 手势密码点的状态
+    public static final int POINT_STATE_NORMAL = 0; // 正常状态
+
+    public static final int POINT_STATE_SELECTED = 1; // 按下状态
+
+    public static final int POINT_STATE_WRONG = 2; // 错误状态
 }

@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
                 break;
             case R.id.rb_gesture_pwd://手势密码解锁
-                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE, true);
+                startActivity(new Intent(this,CreateGestureActivity.class));
+//                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE, true);
                 break;
             case R.id.rb_number_pwd://数字密码解锁
             default:
