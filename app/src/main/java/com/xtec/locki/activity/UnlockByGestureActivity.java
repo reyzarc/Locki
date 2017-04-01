@@ -3,7 +3,11 @@ package com.xtec.locki.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.os.CancellationSignal;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.TextUtils;
@@ -14,7 +18,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
@@ -28,9 +31,13 @@ import com.xtec.locki.widget.gesture.GestureDrawline;
 
 public class UnlockByGestureActivity extends AppCompatActivity implements View.OnClickListener {
 
-    /** 手机号码*/
+    /**
+     * 手机号码
+     */
     public static final String PARAM_PHONE_NUMBER = "PARAM_PHONE_NUMBER";
-    /** 意图 */
+    /**
+     * 意图
+     */
     public static final String PARAM_INTENT_CODE = "PARAM_INTENT_CODE";
     private RelativeLayout mTopLayout;
     private TextView mTextTitle;
@@ -47,6 +54,19 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
     private int mParamIntentCode;
     private String packageName;
 
+    private FingerprintManagerCompat mFingerprintManager = FingerprintManagerCompat.from(this);
+    private static final int HTTP_LOGIN_OUT = 21;
+    private CancellationSignal mCancellationSignal;
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            mCancellationSignal = new CancellationSignal();
+            mFingerprintManager.authenticate(null, 0, mCancellationSignal, new MyCallBack(), null);
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +75,86 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
         ObtainExtraData();
         setUpViews();
         setUpListeners();
+        unlockByFingerprint();
+    }
+
+    private void unlockByFingerprint() {
+        //判断是否添加过指纹
+//        if (!mFingerprintManager.hasEnrolledFingerprints()) {//没有添加过指纹
+//            new FastDialog(this)
+//                    .setContent("你尚未设置过指纹,请前往手机系统\n'设置'>指纹功能中添加指纹")
+//                    .setPositiveButton("确定", new FastDialog.OnClickListener() {
+//                        @Override
+//                        public void onClick(FastDialog dialog) {
+//
+//                        }
+//                    })
+//                    .setNegativeButton("取消", new FastDialog.OnClickListener() {
+//                        @Override
+//                        public void onClick(FastDialog dialog) {
+//
+//                        }
+//                    }).create().show();
+//
+//            return;
+//        }
+
+//        new FastDialog(this)
+//                .setContent("请通过指纹识别器验证\n已录入的指纹")
+//                .setPositiveButton("确定", new FastDialog.OnClickListener() {
+//                    @Override
+//                    public void onClick(FastDialog dialog) {
+//
+//                    }
+//                })
+//                .setNegativeButton("取消", new FastDialog.OnClickListener() {
+//                    @Override
+//                    public void onClick(FastDialog dialog) {
+//                        if(mCancellationSignal!=null){
+//                            mCancellationSignal.cancel();
+//                        }
+//                    }
+//                }).create().show();
+        if (mCancellationSignal != null)
+            mCancellationSignal.cancel();
+        mCancellationSignal = new CancellationSignal();
+        mFingerprintManager.authenticate(null, 0, mCancellationSignal, new MyCallBack(), null);
+
+    }
+
+    private class MyCallBack extends FingerprintManagerCompat.AuthenticationCallback {
+        private static final String TAG = "MyCallBack";
+
+        @Override
+        public void onAuthenticationError(int errMsgId, CharSequence errString) {
+            super.onAuthenticationError(errMsgId, errString);
+//            AndroidUtils.Toast(this, ""+errString);
+//            handler.sendMessageDelayed(new Message(), 1000 * 30);
+//            logout();
+        }
+
+        @Override
+        public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
+            super.onAuthenticationHelp(helpMsgId, helpString);
+        }
+
+        @Override
+        public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
+            super.onAuthenticationSucceeded(result);
+            //发送认证成功的广播
+            Intent intent = new Intent();
+            intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
+            intent.putExtra(Constant.PACKAGE_NAME, packageName);
+            sendBroadcast(intent);
+            finish();
+            overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
+        }
+
+        @Override
+        public void onAuthenticationFailed() {
+            super.onAuthenticationFailed();
+//            AndroidUtils.Toast(UnlockByFingerprintAct.this, "指纹认证失败,请重试");
+        }
     }
 
     private void ObtainExtraData() {
@@ -86,11 +186,11 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
                     @Override
                     public void checkedSuccess() {
                         mGestureContentView.clearDrawlineState(0L);
-                        Toast.makeText(UnlockByGestureActivity.this, "密码正确", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(UnlockByGestureActivity.this, "密码正确", Toast.LENGTH_SHORT).show();
                         //发送认证成功的广播
                         Intent intent = new Intent();
                         intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
-                        intent.putExtra(Constant.PACKAGE_NAME,packageName);
+                        intent.putExtra(Constant.PACKAGE_NAME, packageName);
                         sendBroadcast(intent);
                         finish();
                         overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
@@ -122,12 +222,11 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        builder.append(phoneNumber.subSequence(0,3));
+        builder.append(phoneNumber.subSequence(0, 3));
         builder.append("****");
-        builder.append(phoneNumber.subSequence(7,11));
+        builder.append(phoneNumber.subSequence(7, 11));
         return builder.toString();
     }
-
 
 
     @Override

@@ -39,15 +39,18 @@
 
         <activity android:name=".activity.LockActivity"/>
         <activity android:name=".activity.CreateGestureActivity"/>
+        <activity android:name=".activity.CreateGestureActivityNew"/>
         <activity
             android:name=".activity.UnlockByFingerprintActivity"
             android:excludeFromRecents="true"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance"
+            android:theme="@style/FullScreenTheme"/>
 
         <activity
             android:name=".activity.UnlockByGestureActivity"
             android:excludeFromRecents="true"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleInstance"
+            android:theme="@style/FullScreenTheme"/>
 
     </application>
 

@@ -6,4 +6,15 @@
     <color name="gray">#b9b9b9</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+    <color name="brown">#8C806F</color>
+    <color name="gesture_bg">#48443c</color>
+    <color name="blue_78d2f6">#78d2f6</color>
+    <color name="blue_00aaee">#00aaee</color>
+    <color name="red_f3323b">#f3323b</color>
+    <color name="grey_b2b2b2">#b2b2b2</color>
+    <color name="blue_01aaee">#01aaee</color>
+    <color name="grey_f6f6f6">#f6f6f6</color>
+    <color name="grey_a5a5a5">#a5a5a5</color>
+    <color name="grey_dde1e7">#dde1e7</color>
+    <color name="red_f4333c">#f4333c</color>
 </resources>

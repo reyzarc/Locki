@@ -31,9 +31,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        startService(new Intent(this, LockService.class));
         radioGroup.setOnCheckedChangeListener(this);
         PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
+        startService(new Intent(this, LockService.class));
     }
 
     @Override

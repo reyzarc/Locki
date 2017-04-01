@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#48443c" >
+                android:background="@color/gesture_bg" >
 
     <RelativeLayout
         android:id="@+id/top_layout"
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/top_layout"
         android:orientation="vertical"
-        android:paddingTop="20dip" >
+        android:paddingTop="80dip" >
 
         <ImageView
             android:id="@+id/user_logo"
@@ -57,7 +57,7 @@
             android:layout_marginTop="10dip"
             android:gravity="center_horizontal"
             android:text="186****8888"
-            android:textColor="#8C806F" />
+            android:textColor="@color/brown" />
 
         <TextView
             android:id="@+id/text_tip"
@@ -91,7 +91,7 @@
             android:gravity="center"
             android:textSize="16sp"
             android:text="@string/forget_gesture_code"
-            android:textColor="#E7E7E6" />
+            android:textColor="@color/brown" />
 
         <TextView
             android:id="@+id/text_other_account"
@@ -101,7 +101,7 @@
             android:gravity="center"
             android:textSize="16sp"
             android:text="@string/use_other_account_login"
-            android:textColor="#E7E7E6" />
+            android:textColor="@color/brown" />
     </LinearLayout>
 
 </RelativeLayout>

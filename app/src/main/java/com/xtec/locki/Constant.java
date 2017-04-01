@@ -45,4 +45,5 @@ public class Constant {
     public static final int POINT_STATE_SELECTED = 1; // 按下状态
 
     public static final int POINT_STATE_WRONG = 2; // 错误状态
+    public static final String GESTURE_PASSWORD = "gesture_password";
 }

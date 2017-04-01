@@ -40,7 +40,8 @@ public class LockService extends AccessibilityService {
                 //判断包名是否在加锁列表里,如果在,则继续判断是否已经解锁,如果锁过期,也需要重新解锁,失效时间为2分钟
                 Long currentTime = System.currentTimeMillis();
                 Log.e("reyzarc","时间差为---->"+currentTime+"------->"+PreferenceUtils.getLong(this,mCurrentPackage));
-                if(TextUtils.equals(mTargetPackage,mCurrentPackage)&&!PreferenceUtils.getBoolean(this,Constant.UNLOCK_SUCCESS,true,false)&& System.currentTimeMillis()-PreferenceUtils.getLong(this,mCurrentPackage)>2*60*1000){
+//                if(TextUtils.equals(mTargetPackage,mCurrentPackage)&&!PreferenceUtils.getBoolean(this,Constant.UNLOCK_SUCCESS,true,false)&& System.currentTimeMillis()-PreferenceUtils.getLong(this,mCurrentPackage)>2*60*1000){
+                if(TextUtils.equals(mTargetPackage,mCurrentPackage)&&!PreferenceUtils.getBoolean(this,Constant.UNLOCK_SUCCESS,true,false)){
                     Intent intent = new Intent();
                     intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(Constant.PACKAGE_NAME,mTargetPackage);
