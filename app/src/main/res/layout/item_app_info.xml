@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
-    <LinearLayout
-        android:id="@+id/ll_root"
-        android:layout_width="match_parent"
-        android:layout_height="60dip"
-        android:padding="10dp"
-        android:orientation="horizontal">
+    android:id="@+id/ll_root"
+    android:layout_width="match_parent"
+    android:layout_height="60dip"
+    android:orientation="horizontal"
+    android:padding="10dp">
 
     <ImageView
-        android:layout_gravity="center"
         android:id="@+id/imgApp"
         android:layout_width="46dp"
         android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:src="@mipmap/ic_launcher"/>
 
     <TextView
-        android:layout_marginLeft="20dp"
-        android:layout_gravity="center_vertical"
         android:id="@+id/tvAppLabel"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_weight="1"
         android:text="微信"
-        android:textSize="18sp"
-        android:textColor="@color/gray"/>
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
+
     <com.xtec.locki.widget.SwitchView
         android:id="@+id/lock_status"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="16dp"
         android:layout_width="45dp"
-        android:layout_height="wrap_content"/>
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="10dp"/>
 </LinearLayout>

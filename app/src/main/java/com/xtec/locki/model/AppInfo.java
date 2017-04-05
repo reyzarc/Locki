@@ -13,6 +13,16 @@ public class AppInfo {
     public  static final int ITEM =0;
     public static final int SECTION =1;
 
+    private boolean isOpened;
+
+    public boolean isOpened() {
+        return isOpened;
+    }
+
+    public void setOpened(boolean opened) {
+        isOpened = opened;
+    }
+
     private int type;
 
     public int getType() {

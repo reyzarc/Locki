@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.xtec.locki.R;
 import com.xtec.locki.model.AppInfo;
+import com.xtec.locki.widget.FastDialog;
 import com.xtec.locki.widget.SwitchView;
 
 import java.util.List;
@@ -24,16 +25,18 @@ public class BrowseApplicationInfoAdapter extends BaseAdapter implements PinnedS
 	
 	LayoutInflater infater = null;
 	private Context mContext;
+	private OnStatusChangedListener mOnstatusChangedListener;
     
-	public BrowseApplicationInfoAdapter(Context context,  List<AppInfo> apps) {
+	public BrowseApplicationInfoAdapter(Context context,  List<AppInfo> apps,OnStatusChangedListener onStatusChangedListener) {
 		mContext = context;
 		infater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mlistAppInfo = apps ;
+		this.mOnstatusChangedListener = onStatusChangedListener;
 	}
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		System.out.println("size" + mlistAppInfo.size());
+//		System.out.println("size" + mlistAppInfo.size());
 		return mlistAppInfo.size();
 	}
 	@Override
@@ -59,19 +62,51 @@ public class BrowseApplicationInfoAdapter extends BaseAdapter implements PinnedS
 		AppInfo appInfo = (AppInfo) getItem(position);
 		if(appInfo.getType()==AppInfo.SECTION){
 			holder.appIcon.setVisibility(View.GONE);
-			holder.tvAppLabel.setText(appInfo.getAppLabel());
             holder.lockStatus.setVisibility(View.GONE);
             holder.tvAppLabel.setTextColor(mContext.getResources().getColor(R.color.white));
 			holder.llRoot.setBackgroundColor(mContext.getResources().getColor(R.color.red_f3323b));
 		}else{
 			holder.appIcon.setVisibility(View.VISIBLE);
-			holder.tvAppLabel.setVisibility(View.VISIBLE);
             holder.lockStatus.setVisibility(View.VISIBLE);
             holder.llRoot.setBackgroundColor(mContext.getResources().getColor(R.color.white));
 		}
 
 		holder.appIcon.setImageDrawable(appInfo.getAppIcon());
 		holder.tvAppLabel.setText(appInfo.getAppLabel());
+
+		holder.lockStatus.setOpened(appInfo.isOpened());
+
+		holder.lockStatus.setOnStateChangedListener(new SwitchView.OnStateChangedListener() {
+			@Override
+			public void toggleToOn(View view) {
+				((SwitchView)view).toggleSwitch(true);
+				appInfo.setOpened(true);
+				mOnstatusChangedListener.onStatusChange(appInfo);
+			}
+
+			@Override
+			public void toggleToOff(View view) {
+				new FastDialog(mContext)
+						.setTitle("提示")
+						.setContent("关闭密码锁功能将导致应用安全性降低,存在隐私泄露的风险,\n您确定要关闭吗")
+						.setNegativeButton("取消", new FastDialog.OnClickListener() {
+							@Override
+							public void onClick(FastDialog dialog) {
+								((SwitchView)view).toggleSwitch(true);
+								appInfo.setOpened(true);
+
+							}
+						})
+						.setPositiveButton("确定", new FastDialog.OnClickListener() {
+							@Override
+							public void onClick(FastDialog dialog) {
+								((SwitchView)view).toggleSwitch(false);
+								appInfo.setOpened(false);
+								mOnstatusChangedListener.onStatusChange(appInfo);
+							}
+						}).create().show();
+			}
+		});
 		return convertView;
 	}
 
@@ -103,5 +138,9 @@ public class BrowseApplicationInfoAdapter extends BaseAdapter implements PinnedS
 			this.llRoot = (LinearLayout) view.findViewById(R.id.ll_root);
             this.lockStatus = (SwitchView) view.findViewById(R.id.lock_status);
 		}
+	}
+
+	public interface OnStatusChangedListener{
+		void onStatusChange(AppInfo appInfo);
 	}
 }

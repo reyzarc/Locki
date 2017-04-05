@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RadioButton;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private List<AppInfo> mlistAppInfo = null;
     private PackageManager pm;
 
+    private List<String> mLockList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,14 +60,26 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         mlistAppInfo = new ArrayList<AppInfo>();
 //        queryAppInfo(); // 查询所有应用程序信息
 //        queryAllAppInfo();//查询所有应用信息
-        quaryCustomAppInfo();//查询用户安装的应用
+        queryCustomAppInfo();//查询用户安装的应用
         BrowseApplicationInfoAdapter browseAppAdapter = new BrowseApplicationInfoAdapter(
-                this, mlistAppInfo);
+                this, mlistAppInfo, new BrowseApplicationInfoAdapter.OnStatusChangedListener() {
+            @Override
+            public void onStatusChange(AppInfo appInfo) {
+                if(appInfo.isOpened()){
+                    mLockList.add(appInfo.getPkgName());
+                }else{
+                    mLockList.remove(appInfo.getPkgName());
+                }
+                for (int i = 0; i < mLockList.size(); i++) {
+                    Log.e("reyzarc",i+"----->"+mLockList.get(i).toString());
+                }
+            }
+        });
         lv.setAdapter(browseAppAdapter);
         lv.setOnItemClickListener(this);
     }
 
-    private void quaryCustomAppInfo() {
+    private void queryCustomAppInfo() {
         pm = this.getPackageManager();
         // 查询所有已经安装的应用程序
         List<ApplicationInfo> listAppcations = pm
@@ -140,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         if(mlistAppInfo.get(position).getType()==AppInfo.SECTION){
             return;
         }
-        Intent intent = mlistAppInfo.get(position).getIntent();
-        startActivity(intent);
+//        Intent intent = mlistAppInfo.get(position).getIntent();
+//        startActivity(intent);
     }
 
     // 获得所有启动Activity的信息，类似于Launch界面
