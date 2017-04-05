@@ -76,11 +76,11 @@ public  class PreferenceUtils {
         return getLong(context, key, -1);
     }
 
-
     public static long getLong(Context context, String key, long defaultValue) {
-        SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
+        SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);
         return settings.getLong(key, defaultValue);
     }
+
 
 
     public static boolean putFloat(Context context, String key, float value) {
@@ -163,9 +163,21 @@ public  class PreferenceUtils {
      * @param defaultValue 默认值
      * @return
      */
-    public static boolean getBoolean(Context context, String key,boolean multi_process,boolean defaultValue) {
+    public static boolean getBoolean(Context context, String key,boolean defaultValue,boolean multi_process) {
         SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);
-        return settings.getBoolean(key,false);
+        return settings.getBoolean(key,defaultValue);
+    }
+
+    public static boolean putLong(Context context, String key, long value,boolean multi_process) {
+        SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong(key, value);
+        return editor.commit();
+    }
+
+    public static long getLong(Context context, String key, long defaultValue,boolean muti_process) {
+        SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);
+        return settings.getLong(key, defaultValue);
     }
 
 }
