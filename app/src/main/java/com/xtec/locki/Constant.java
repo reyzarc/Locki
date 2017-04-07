@@ -35,6 +35,10 @@ public class Constant {
      */
     public static final String ACTION_UNLOCK_SUCCESS = "action_unlock_success";
     /**
+     * 更新加锁列表的广播的action
+     */
+    public static final String ACTION_UPDATE_UNLOCK_LIST = "action_update_unlock_list";
+    /**
      * 解锁时间
      */
     public static final String UNLOCK_DATE = "unlock_date";
@@ -46,4 +50,5 @@ public class Constant {
 
     public static final int POINT_STATE_WRONG = 2; // 错误状态
     public static final String GESTURE_PASSWORD = "gesture_password";
+    public static final String LOCK_LIST = "lock_list";
 }

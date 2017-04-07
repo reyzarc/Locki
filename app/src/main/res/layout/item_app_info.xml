@@ -2,21 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_root"
     android:layout_width="match_parent"
-    android:layout_height="60dip"
+    android:layout_height="60dp"
     android:orientation="horizontal"
     android:padding="10dp">
 
     <ImageView
+        android:layout_marginLeft="10dp"
         android:id="@+id/imgApp"
-        android:layout_width="46dp"
-        android:layout_height="match_parent"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:src="@mipmap/ic_launcher"/>
 
     <TextView
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:gravity="center_vertical"
         android:id="@+id/tvAppLabel"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="20dp"
         android:layout_weight="1"
@@ -25,6 +29,7 @@
         android:textSize="18sp"/>
 
     <com.xtec.locki.widget.SwitchView
+        android:layout_gravity="center_vertical"
         android:id="@+id/lock_status"
         android:layout_width="45dp"
         android:layout_height="wrap_content"

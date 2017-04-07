@@ -7,20 +7,26 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.adapter.BrowseApplicationInfoAdapter;
 import com.xtec.locki.model.AppInfo;
 import com.xtec.locki.service.LockService;
+import com.xtec.locki.utils.AppUtil;
 import com.xtec.locki.utils.PreferenceUtils;
+import com.xtec.locki.widget.FastDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,17 +53,28 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private PackageManager pm;
 
     private List<String> mLockList = new ArrayList<>();
+    private boolean hasList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        //获取之前保存的列表
+        String str = PreferenceUtils.getString(this, Constant.LOCK_LIST);
+        if (!TextUtils.isEmpty(str)) {
+            hasList = true;
+            Gson gson = new Gson();
+            mLockList = gson.fromJson(str, new TypeToken<List<String>>() {
+            }.getType());
+        }
+
         radioGroup.setOnCheckedChangeListener(this);
-        PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
+        PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT);
         startService(new Intent(this, LockService.class));
 
-        mlistAppInfo = new ArrayList<AppInfo>();
+        mlistAppInfo = new ArrayList<>();
 //        queryAppInfo(); // 查询所有应用程序信息
 //        queryAllAppInfo();//查询所有应用信息
         queryCustomAppInfo();//查询用户安装的应用
@@ -65,13 +82,10 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 this, mlistAppInfo, new BrowseApplicationInfoAdapter.OnStatusChangedListener() {
             @Override
             public void onStatusChange(AppInfo appInfo) {
-                if(appInfo.isOpened()){
+                if (appInfo.isOpened()) {
                     mLockList.add(appInfo.getPkgName());
-                }else{
+                } else {
                     mLockList.remove(appInfo.getPkgName());
-                }
-                for (int i = 0; i < mLockList.size(); i++) {
-                    Log.e("reyzarc",i+"----->"+mLockList.get(i).toString());
                 }
             }
         });
@@ -79,6 +93,38 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         lv.setOnItemClickListener(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //检查辅助功能中的服务是否开启
+        checkServiceEnable();
+    }
+
+    private void checkServiceEnable() {
+        if (!AppUtil.isAccessibilitySettingsOn(this, LockService.class)) {
+            new FastDialog(this)
+                    .setTitle("提示")
+                    .setContent("应用锁需要开启辅助功能才能正常运行,请前往设置->无障碍或者设置->高级->辅助功能中,找到LockService并开启)")
+                    .setPositiveButton("前往设置", new FastDialog.OnClickListener() {
+                        @Override
+                        public void onClick(FastDialog dialog) {
+                            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                            startActivity(intent);
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("残忍拒绝", new FastDialog.OnClickListener() {
+                        @Override
+                        public void onClick(FastDialog dialog) {
+                            finish();
+                        }
+                    }).create().show();
+        }
+    }
+
+    /**
+     * 查询用户安装的第三方应用
+     */
     private void queryCustomAppInfo() {
         pm = this.getPackageManager();
         // 查询所有已经安装的应用程序
@@ -93,7 +139,16 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         mlistAppInfo.add(appTitle);
         for (ApplicationInfo app : listAppcations) {
             if ((app.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {
-                mlistAppInfo.add(getAppInfo(app));
+                AppInfo appInfo = getAppInfo(app);
+                if (hasList) {
+                    for (int i = 0; i < mLockList.size(); i++) {
+                        if (TextUtils.equals(app.packageName, mLockList.get(i))) {
+                            appInfo.setOpened(true);
+                            break;
+                        }
+                    }
+                }
+                mlistAppInfo.add(appInfo);
             }
         }
 
@@ -101,6 +156,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         querySystemAppInfo();
     }
 
+    /**
+     * 查询系统自带应用
+     */
     private void querySystemAppInfo() {
         List<ApplicationInfo> listAppcations = pm
                 .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
@@ -112,11 +170,24 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         mlistAppInfo.add(appTitle);
         for (ApplicationInfo app : listAppcations) {
             if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                mlistAppInfo.add(getAppInfo(app));
+                //判断以前是否有设置开启过
+                AppInfo appInfo = getAppInfo(app);
+                if (hasList) {
+                    for (int i = 0; i < mLockList.size(); i++) {
+                        if (TextUtils.equals(app.packageName, mLockList.get(i))) {
+                            appInfo.setOpened(true);
+                            break;
+                        }
+                    }
+                }
+                mlistAppInfo.add(appInfo);
             }
         }
     }
 
+    /**
+     * 查询所有应用
+     */
     private void queryAllAppInfo() {
         pm = this.getPackageManager();
         // 查询所有已经安装的应用程序
@@ -135,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
         switch (i) {
             case R.id.rb_fingerprint://指纹解锁
-                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT, true);
+                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT);
                 break;
             case R.id.rb_gesture_pwd://手势密码解锁
                 startActivity(new Intent(this, CreateGestureActivity.class));
@@ -143,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 break;
             case R.id.rb_number_pwd://数字密码解锁
             default:
-                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER, true);
+                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER);
                 break;
         }
     }
@@ -152,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     public void onItemClick(AdapterView<?> arg0, View view, int position,
                             long arg3) {
         // TODO Auto-generated method stub
-        if(mlistAppInfo.get(position).getType()==AppInfo.SECTION){
+        if (mlistAppInfo.get(position).getType() == AppInfo.SECTION) {
             return;
         }
 //        Intent intent = mlistAppInfo.get(position).getIntent();
@@ -206,6 +277,12 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     @Override
     protected void onStop() {
         super.onStop();
-        finish();
+        Gson gson = new Gson();
+        String str = gson.toJson(mLockList);
+        Log.e("reyzarc", "数据是---->" + str);
+        if (!TextUtils.isEmpty(str)) {
+            PreferenceUtils.putString(this, Constant.LOCK_LIST, str);
+            sendBroadcast(new Intent(Constant.ACTION_UPDATE_UNLOCK_LIST));
+        }
     }
 }

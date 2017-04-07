@@ -82,7 +82,7 @@ public class CreateGestureActivity extends AppCompatActivity implements View.OnC
                         Toast.makeText(CreateGestureActivity.this, "设置成功", Toast.LENGTH_SHORT).show();
                         mGestureContentView.clearDrawlineState(0L);
                         //保存选中的状态
-                        PreferenceUtils.putString(CreateGestureActivity.this, Constant.LOCK_METHOD, Constant.GESTURE, true);
+                        PreferenceUtils.putString(CreateGestureActivity.this, Constant.LOCK_METHOD, Constant.GESTURE);
                         finish();
                     } else {
                         mTextTip.setText(Html.fromHtml("<font color='#c70c1e'>与上一次绘制不一致，请重新绘制</font>"));
