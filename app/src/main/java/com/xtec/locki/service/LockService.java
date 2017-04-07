@@ -32,6 +32,10 @@ import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICK
 public class LockService extends AccessibilityService {
     private CharSequence mWindowClassName;
     /**
+     * 超时时间
+     */
+    private static final int Timeout = 5 * 60 * 1000;
+    /**
      * 当前应用包名
      */
     private String mCurrentPackage;
@@ -43,7 +47,8 @@ public class LockService extends AccessibilityService {
     /**
      * 不加锁的应用列表
      */
-    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox", "com.android.systemui", "com.xtec.locki", "com.cyou.privacysecurity"};
+//    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox", "com.android.systemui", "com.xtec.locki", "com.cyou.privacysecurity"};
+    private String[] mFilterPackage = new String[]{ "com.xtec.locki"};
     private List<String> mLockList = new ArrayList<>();
 
     @Override
@@ -51,11 +56,22 @@ public class LockService extends AccessibilityService {
         int type = event.getEventType();
         switch (type) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-                Log.e("reyzarc","window state changed is running....");
-
                 mWindowClassName = event.getClassName();
-                //过滤掉像系统锁屏界面/launcher等
                 mCurrentPackage = event.getPackageName() == null ? "" : event.getPackageName().toString();
+                Log.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
+
+
+                //判断当前将要打开的应用是否跟之前的应用包名不一样,如果不一样,则将之前的应用锁重置
+                //如果应用包名一样,再判断锁是否超时,如果超时,则也要将应用锁重置,超时时间为5分钟
+                Long currentTime = System.currentTimeMillis();
+                Log.e("reyzarc", "时间差为---->" + currentTime + "------->" + PreferenceUtils.getLong(this, mCurrentPackage + "time"));
+                if (!TextUtils.equals(mCurrentPackage, mTargetPackage)) {
+                    PreferenceUtils.putBoolean(this, mTargetPackage, false);
+                } else if (currentTime - PreferenceUtils.getLong(this, mTargetPackage + "time") > Timeout) {
+                    PreferenceUtils.putBoolean(this, mTargetPackage, false);
+                    PreferenceUtils.putLong(this, mTargetPackage + "time", System.currentTimeMillis());
+                }
+                //过滤掉像系统锁屏界面/launcher等
                 for (int i = 0; i < mFilterPackage.length; i++) {
                     if (TextUtils.equals(mCurrentPackage, mFilterPackage[i])) {
                         return;
@@ -65,24 +81,11 @@ public class LockService extends AccessibilityService {
                 if (!checkInList(mCurrentPackage)) {
                     return;
                 }
-                //判断当前将要打开的应用是否跟之前的应用包名不一样,如果不一样,则将之前的应用锁重置
-                //如果应用包名一样,再判断锁是否超时,如果超时,则也要将应用锁重置
-                Log.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
-
-                Long currentTime = System.currentTimeMillis();
-                Log.e("reyzarc", "时间差为---->" + currentTime + "------->" + PreferenceUtils.getLong(this, mCurrentPackage + "time"));
-                if (!TextUtils.equals(mCurrentPackage, mTargetPackage)) {
-                    PreferenceUtils.putBoolean(this, mCurrentPackage, false);
-                } else if (currentTime - PreferenceUtils.getLong(this, mCurrentPackage + "time") > 10 * 1000) {
-                    PreferenceUtils.putBoolean(this, mCurrentPackage, false);
-                    PreferenceUtils.putLong(this, mCurrentPackage + "time", System.currentTimeMillis());
-                }
                 mTargetPackage = mCurrentPackage;
                 checkLockStatus(mTargetPackage);
 
                 break;
             case TYPE_VIEW_CLICKED:
-                Log.e("reyzarc","click is running....");
             case TYPE_VIEW_LONG_CLICKED:
                 break;
         }
