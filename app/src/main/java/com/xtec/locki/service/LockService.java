@@ -20,6 +20,7 @@ import com.xtec.locki.utils.PreferenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICKED;
@@ -90,9 +91,11 @@ public class LockService extends AccessibilityService {
 
     private void checkLockStatus(String targetPackage) {
         if (!PreferenceUtils.getBoolean(this, targetPackage)) {
+            PreferenceUtils.putString(this,Constant.PACKAGE_NAME,targetPackage);
             Intent intent = new Intent();
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra(Constant.PACKAGE_NAME, targetPackage);
+            intent.setFlags(FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//            intent.putExtra(Constant.PACKAGE_NAME, targetPackage);
             switch (PreferenceUtils.getString(this, Constant.LOCK_METHOD)) {
                 case Constant.FINGERPRINT://指纹
                     intent.setClass(this, UnlockByFingerprintActivity.class);

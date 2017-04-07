@@ -3,11 +3,15 @@
  */
 package com.xtec.locki.utils;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
+
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -73,5 +77,51 @@ public class AppUtil {
 		}
 		return false;
 	}
-    
+
+
+	/**
+	 * 判断当前程序是否运行在前台
+	 *
+	 * @return
+	 */
+	public static boolean isRunningForeground(Context context,String packageName) {
+		String topActivityClassName = getTopActivityName(context);
+		Log.e("gesture",packageName+"--->"+topActivityClassName);
+		if (!TextUtils.isEmpty(packageName) && !TextUtils.isEmpty(topActivityClassName)
+				&& topActivityClassName.startsWith(packageName)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 获得包名
+	 * @param context
+	 * @return
+	 */
+	public static String getPackageName(Context context) {
+		String pkName = context.getPackageName();
+		return pkName;
+	}
+
+	/**
+	 * 获得栈顶的activity名称
+	 * @param context
+	 * @return
+	 */
+	public static String getTopActivityName(Context context) {
+		String topActivityClassName = null;
+		ActivityManager activityManager = (ActivityManager) (context
+				.getSystemService(android.content.Context.ACTIVITY_SERVICE));
+		List<ActivityManager.RunningTaskInfo> runningTaskInfos = activityManager
+				.getRunningTasks(1);
+		if (runningTaskInfos != null) {
+			ComponentName f = runningTaskInfos.get(0).topActivity;
+			topActivityClassName = f.getClassName();
+		}
+		return topActivityClassName;
+	}
+
+
 }

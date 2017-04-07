@@ -10,11 +10,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
+import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.widget.FastDialog;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by 武昌丶鱼 on 2017/3/24.
@@ -23,12 +29,15 @@ import com.xtec.locki.widget.FastDialog;
 
 public class UnlockByFingerprintActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "UnlockByFingerprintAct";
+    @BindView(R.id.ll_fingerprint)
+    LinearLayout llFingerprint;
+    @BindView(R.id.tv_login_by_pwd)
+    TextView tvLoginByPwd;
+    @BindView(R.id.rl_root)
+    RelativeLayout rlRoot;
 
     private FingerprintManagerCompat mFingerprintManager = FingerprintManagerCompat.from(this);
-    private static final int HTTP_LOGIN_OUT = 21;
     private CancellationSignal mCancellationSignal;
-
-    private LinearLayout llFingerprint;
 
     private String packageName;
 
@@ -46,35 +55,30 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_fingerprint);
-
-        packageName = getIntent().getStringExtra(Constant.PACKAGE_NAME);
-
-        TextView tvLoginByPwd = (TextView) findViewById(R.id.tv_login_by_pwd);
-        llFingerprint = (LinearLayout) findViewById(R.id.ll_fingerprint);
-
-
-        tvLoginByPwd.setOnClickListener(this);
-        llFingerprint.setOnClickListener(this);
-        showFingerprintDialog();
+        ButterKnife.bind(this);
     }
 
-
-
-
     @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.ll_fingerprint://指纹登陆
-                showFingerprintDialog();
+    protected void onResume() {
+        super.onResume();
+//        packageName = getIntent().getStringExtra(Constant.PACKAGE_NAME);
+        packageName = PreferenceUtils.getString(this,Constant.PACKAGE_NAME);
+        if(mCancellationSignal==null){
+            mCancellationSignal = new CancellationSignal();
+            mFingerprintManager.authenticate(null, 0, mCancellationSignal, new MyCallBack(), null);
+        }
+    }
 
-                break;
-            case R.id.tv_login_by_pwd://用账号密码登录
+    @OnClick({R.id.rl_root})
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.rl_root:
+                showFingerprintDialog();
                 break;
         }
     }
 
     private void showFingerprintDialog() {
-
         //判断是否添加过指纹
         if (!mFingerprintManager.hasEnrolledFingerprints()) {//没有添加过指纹
             new FastDialog(this)
@@ -106,15 +110,16 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
                 .setNegativeButton("取消", new FastDialog.OnClickListener() {
                     @Override
                     public void onClick(FastDialog dialog) {
-                        if(mCancellationSignal!=null){
+                        if (mCancellationSignal != null) {
                             mCancellationSignal.cancel();
                         }
                     }
                 }).create().show();
 
-        mCancellationSignal = new CancellationSignal();
+        if (mCancellationSignal == null) {
+            mCancellationSignal = new CancellationSignal();
+        }
         mFingerprintManager.authenticate(null, 0, mCancellationSignal, new MyCallBack(), null);
-
     }
 
     private class MyCallBack extends FingerprintManagerCompat.AuthenticationCallback {
@@ -136,11 +141,11 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
         @Override
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
-            Log.e("reyzarc","指纹认证成功....");
+            Log.e("reyzarc", "指纹认证成功....");
             //发送认证成功的广播
             Intent intent = new Intent();
             intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
-            intent.putExtra(Constant.PACKAGE_NAME,packageName);
+            intent.putExtra(Constant.PACKAGE_NAME, packageName);
             sendBroadcast(intent);
             finish();
             overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
@@ -153,10 +158,16 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
         }
     }
 
-
     @Override
     public void onBackPressed() {
-
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mCancellationSignal != null) {
+            mCancellationSignal.cancel();
+            mCancellationSignal = null;
+        }
+    }
 }

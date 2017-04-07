@@ -38,4 +38,12 @@
         <item name="android:backgroundDimAmount">0.6</item>
     </style>
 
+    <!--切换动画-->
+    <style name="ActivitySwitchStyle">
+        <item name="android:activityOpenEnterAnimation">@anim/right_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/anim_stay</item>
+        <item name="android:activityCloseEnterAnimation">@anim/anim_stay</item>
+        <item name="android:activityCloseExitAnimation">@anim/right_out</item>
+    </style>
+
 </resources>

@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
+import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.widget.gesture.GestureContentView;
 import com.xtec.locki.widget.gesture.GestureDrawline;
 
@@ -71,7 +72,7 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_gesture);
-        packageName = getIntent().getStringExtra(Constant.PACKAGE_NAME);
+        packageName = PreferenceUtils.getString(this,Constant.PACKAGE_NAME);
         ObtainExtraData();
         setUpViews();
         setUpListeners();
@@ -252,4 +253,8 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
         }
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
 }
