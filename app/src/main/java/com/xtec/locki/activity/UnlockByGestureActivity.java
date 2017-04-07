@@ -75,7 +75,19 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
         ObtainExtraData();
         setUpViews();
         setUpListeners();
-        unlockByFingerprint();
+        if (supportFingerprint()) {//支持指纹解锁
+            unlockByFingerprint();
+        }
+    }
+
+    //判断手机是否支持指纹解锁
+    private boolean supportFingerprint() {
+        FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(this);
+        if (!fingerprintManager.isHardwareDetected()) {//不支持指纹
+            return false;
+        } else {//支持指纹识别
+            return true;
+        }
     }
 
     private void unlockByFingerprint() {

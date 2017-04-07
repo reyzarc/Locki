@@ -43,64 +43,66 @@ public class LockService extends AccessibilityService {
     /**
      * 不加锁的应用列表
      */
-    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox","com.android.systemui","com.xtec.locki","com.cyou.privacysecurity"};
+    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox", "com.android.systemui", "com.xtec.locki", "com.cyou.privacysecurity"};
     private List<String> mLockList = new ArrayList<>();
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        int type=event.getEventType();
-        switch (type){
+        int type = event.getEventType();
+        switch (type) {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
+                Log.e("reyzarc","window state changed is running....");
+
                 mWindowClassName = event.getClassName();
                 //过滤掉像系统锁屏界面/launcher等
-                mCurrentPackage = event.getPackageName()==null?"":event.getPackageName().toString();
+                mCurrentPackage = event.getPackageName() == null ? "" : event.getPackageName().toString();
                 for (int i = 0; i < mFilterPackage.length; i++) {
-                    if(TextUtils.equals(mCurrentPackage,mFilterPackage[i])){
+                    if (TextUtils.equals(mCurrentPackage, mFilterPackage[i])) {
                         return;
                     }
                 }
-                //判断当前打开的应用是否跟之前的应用包名不一样,或者是否已超时,如果是,则重置锁状态
-                Long currentTime = System.currentTimeMillis();
-                Log.e("reyzarc","时间差为---->"+currentTime+"------->"+PreferenceUtils.getLong(this,mCurrentPackage+"time"));
-                if(!TextUtils.equals(mCurrentPackage,mTargetPackage)||(currentTime-PreferenceUtils.getLong(this,mCurrentPackage+"time")>10*1000)){
-                    PreferenceUtils.putBoolean(this,mCurrentPackage,false);
-                    PreferenceUtils.putLong(this,mCurrentPackage+"time",System.currentTimeMillis());
-                    mTargetPackage = mCurrentPackage;
-                    checkLockStatus(mTargetPackage);
+                //如果不在加锁列表中,也不需要处理
+                if (!checkInList(mCurrentPackage)) {
+                    return;
                 }
+                //判断当前将要打开的应用是否跟之前的应用包名不一样,如果不一样,则将之前的应用锁重置
+                //如果应用包名一样,再判断锁是否超时,如果超时,则也要将应用锁重置
+                Log.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
 
-
-//                if(!TextUtils.equals(mLastPackage,mCurrentPackage)){
-//                    PreferenceUtils.putBoolean(LockService.this,mCurrentPackage,false,true);
-//                }
-                //判断包名是否在加锁列表里,如果在,则继续判断是否已经解锁,如果锁过期,也需要重新解锁,失效时间为2分钟
-//                Long currentTime = System.currentTimeMillis();
-//                Log.e("reyzarc","时间差为---->"+currentTime+"------->"+PreferenceUtils.getLong(this,mCurrentPackage));
-//                if(TextUtils.equals(mTargetPackage,mCurrentPackage)&&!PreferenceUtils.getBoolean(this,Constant.UNLOCK_SUCCESS,true,false)&& System.currentTimeMillis()-PreferenceUtils.getLong(this,mCurrentPackage)>2*60*1000){
-
-                Log.e("reyzarc","当前包名是---->"+mCurrentPackage);
+                Long currentTime = System.currentTimeMillis();
+                Log.e("reyzarc", "时间差为---->" + currentTime + "------->" + PreferenceUtils.getLong(this, mCurrentPackage + "time"));
+                if (!TextUtils.equals(mCurrentPackage, mTargetPackage)) {
+                    PreferenceUtils.putBoolean(this, mCurrentPackage, false);
+                } else if (currentTime - PreferenceUtils.getLong(this, mCurrentPackage + "time") > 10 * 1000) {
+                    PreferenceUtils.putBoolean(this, mCurrentPackage, false);
+                    PreferenceUtils.putLong(this, mCurrentPackage + "time", System.currentTimeMillis());
+                }
+                mTargetPackage = mCurrentPackage;
+                checkLockStatus(mTargetPackage);
 
                 break;
             case TYPE_VIEW_CLICKED:
+                Log.e("reyzarc","click is running....");
             case TYPE_VIEW_LONG_CLICKED:
                 break;
         }
     }
 
     private void checkLockStatus(String targetPackage) {
-        if(checkInList(targetPackage)&&!PreferenceUtils.getBoolean(this,targetPackage)){
+        if (!PreferenceUtils.getBoolean(this, targetPackage)) {
             Intent intent = new Intent();
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra(Constant.PACKAGE_NAME,targetPackage);
-            switch (PreferenceUtils.getString(this, Constant.LOCK_METHOD)){
+            intent.putExtra(Constant.PACKAGE_NAME, targetPackage);
+            switch (PreferenceUtils.getString(this, Constant.LOCK_METHOD)) {
                 case Constant.FINGERPRINT://指纹
-                    intent.setClass(this,UnlockByFingerprintActivity.class);
+                    intent.setClass(this, UnlockByFingerprintActivity.class);
                     break;
                 case Constant.GESTURE://手势
-                    intent.setClass(this,UnlockByGestureActivity.class);
+                    intent.setClass(this, UnlockByGestureActivity.class);
                     break;
                 case Constant.NUMBER://密码
                 default:
-                    intent.setClass(this,UnlockByNumberActivity.class);
+                    intent.setClass(this, UnlockByNumberActivity.class);
                     break;
             }
             startActivity(intent);
@@ -122,7 +124,7 @@ public class LockService extends AccessibilityService {
         filter.addAction(Constant.ACTION_UNLOCK_SUCCESS);
         filter.addAction(Constant.ACTION_UPDATE_UNLOCK_LIST);
         mReceiver = new MyBroadcastReceiver();
-        registerReceiver(mReceiver,filter);
+        registerReceiver(mReceiver, filter);
 
         IntentFilter mScreenOnFilter = new IntentFilter("android.intent.action.SCREEN_ON");
         registerReceiver(mScreenOReceiver, mScreenOnFilter);
@@ -134,23 +136,24 @@ public class LockService extends AccessibilityService {
 
     private void getLockList() {
         String str = PreferenceUtils.getString(this, Constant.LOCK_LIST);
-        if (!TextUtils.isEmpty(str)){
+        if (!TextUtils.isEmpty(str)) {
             Gson gson = new Gson();
-            mLockList = gson.fromJson(str, new TypeToken<List<String>>() {}.getType());
+            mLockList = gson.fromJson(str, new TypeToken<List<String>>() {
+            }.getType());
         }
     }
 
-    private class MyBroadcastReceiver extends BroadcastReceiver{
+    private class MyBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            String packageName  = intent.getStringExtra(Constant.PACKAGE_NAME);
-            if(!TextUtils.isEmpty(action)&&TextUtils.equals(action,Constant.ACTION_UNLOCK_SUCCESS)){//解锁成功
-                Log.e("reyzarc","解锁成功....."+packageName);
-                PreferenceUtils.putBoolean(LockService.this,packageName,true);
+            String packageName = intent.getStringExtra(Constant.PACKAGE_NAME);
+            if (!TextUtils.isEmpty(action) && TextUtils.equals(action, Constant.ACTION_UNLOCK_SUCCESS)) {//解锁成功
+                Log.e("reyzarc", "解锁成功....." + packageName);
+                PreferenceUtils.putBoolean(LockService.this, packageName, true);
                 //保存时间,以当前加锁应用的包名为key
 //                PreferenceUtils.putLong(LockService.this,packageName, System.currentTimeMillis(),true);
-            }else if(!TextUtils.isEmpty(action)&&TextUtils.equals(action,Constant.ACTION_UPDATE_UNLOCK_LIST)){//更新加锁列表
+            } else if (!TextUtils.isEmpty(action) && TextUtils.equals(action, Constant.ACTION_UPDATE_UNLOCK_LIST)) {//更新加锁列表
                 getLockList();
             }
         }
@@ -166,12 +169,12 @@ public class LockService extends AccessibilityService {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals("android.intent.action.SCREEN_ON")) {//亮屏
-                Log.e("reyzarc","—— SCREEN_ON ——");
+                Log.e("reyzarc", "—— SCREEN_ON ——");
             } else if (action.equals("android.intent.action.SCREEN_OFF")) {//熄屏
                 //将锁重置为未解锁状态
-                Log.e("reyzarc","—— SCREEN_OFF ——"+mTargetPackage);
-                if (!TextUtils.isEmpty(mTargetPackage)){
-                    PreferenceUtils.putBoolean(LockService.this,mTargetPackage,false);
+                Log.e("reyzarc", "—— SCREEN_OFF ——" + mTargetPackage);
+                if (!TextUtils.isEmpty(mTargetPackage)) {
+                    PreferenceUtils.putBoolean(LockService.this, mTargetPackage, false);
                 }
             }
         }
@@ -185,13 +188,14 @@ public class LockService extends AccessibilityService {
 
     /**
      * 判断是否在加锁列表中
+     *
      * @param packageName
      * @return
      */
-    public boolean checkInList(String packageName){
+    public boolean checkInList(String packageName) {
         if (!mLockList.isEmpty()) {
             for (int i = 0; i < mLockList.size(); i++) {
-                if(TextUtils.equals(mLockList.get(i),packageName)){
+                if (TextUtils.equals(mLockList.get(i), packageName)) {
                     return true;
                 }
             }

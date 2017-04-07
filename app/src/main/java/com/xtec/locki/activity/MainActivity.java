@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -60,6 +61,14 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        //判断手机是否支持指纹解锁
+        FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(this);
+        if (!fingerprintManager.isHardwareDetected()) {//不支持指纹
+            rbFingerprint.setVisibility(View.GONE);
+        } else {//支持指纹识别
+            rbFingerprint.setVisibility(View.VISIBLE);
+        }
 
         //获取之前保存的列表
         String str = PreferenceUtils.getString(this, Constant.LOCK_LIST);
