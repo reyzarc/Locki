@@ -60,14 +60,11 @@ public class LockService extends AccessibilityService {
                 mCurrentPackage = event.getPackageName() == null ? "" : event.getPackageName().toString();
                 Log.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
 
-
                 //判断当前将要打开的应用是否跟之前的应用包名不一样,如果不一样,则将之前的应用锁重置
                 //如果应用包名一样,再判断锁是否超时,如果超时,则也要将应用锁重置,超时时间为5分钟
-                Long currentTime = System.currentTimeMillis();
-                Log.e("reyzarc", "时间差为---->" + currentTime + "------->" + PreferenceUtils.getLong(this, mCurrentPackage + "time"));
                 if (!TextUtils.equals(mCurrentPackage, mTargetPackage)) {
                     PreferenceUtils.putBoolean(this, mTargetPackage, false);
-                } else if (currentTime - PreferenceUtils.getLong(this, mTargetPackage + "time") > Timeout) {
+                } else if (System.currentTimeMillis() - PreferenceUtils.getLong(this, mTargetPackage + "time") > Timeout) {
                     PreferenceUtils.putBoolean(this, mTargetPackage, false);
                     PreferenceUtils.putLong(this, mTargetPackage + "time", System.currentTimeMillis());
                 }
@@ -155,7 +152,7 @@ public class LockService extends AccessibilityService {
                 Log.e("reyzarc", "解锁成功....." + packageName);
                 PreferenceUtils.putBoolean(LockService.this, packageName, true);
                 //保存时间,以当前加锁应用的包名为key
-//                PreferenceUtils.putLong(LockService.this,packageName, System.currentTimeMillis(),true);
+                PreferenceUtils.putLong(LockService.this,packageName+"time", System.currentTimeMillis());
             } else if (!TextUtils.isEmpty(action) && TextUtils.equals(action, Constant.ACTION_UPDATE_UNLOCK_LIST)) {//更新加锁列表
                 getLockList();
             }
