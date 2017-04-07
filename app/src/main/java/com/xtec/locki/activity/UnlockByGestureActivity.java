@@ -72,13 +72,18 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_gesture);
-        packageName = PreferenceUtils.getString(this,Constant.PACKAGE_NAME);
         ObtainExtraData();
         setUpViews();
         setUpListeners();
         if (supportFingerprint()) {//支持指纹解锁
             unlockByFingerprint();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        packageName = PreferenceUtils.getString(this,Constant.PACKAGE_NAME);
     }
 
     //判断手机是否支持指纹解锁
