@@ -49,7 +49,7 @@ public class LockService extends AccessibilityService {
      * 不加锁的应用列表
      */
 //    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox", "com.android.systemui", "com.xtec.locki", "com.cyou.privacysecurity"};
-    private String[] mFilterPackage = new String[]{ "com.xtec.locki"};
+    private String[] mFilterPackage = new String[]{ "com.xtec.locki","com.google.android.inputmethod.pinyin","com.android.systemui","com.iflytek.inputmethod"};
     private List<String> mLockList = new ArrayList<>();
 
     @Override
@@ -61,6 +61,17 @@ public class LockService extends AccessibilityService {
                 mCurrentPackage = event.getPackageName() == null ? "" : event.getPackageName().toString();
                 Log.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
 
+
+                //过滤掉像系统锁屏界面/launcher,输入法等
+                if(mCurrentPackage.contains("inputmethod")){
+                    return;
+                }
+                for (String filterPackage : mFilterPackage) {
+                    if (TextUtils.equals(mCurrentPackage, filterPackage)) {
+                        return;
+                    }
+                }
+
                 //判断当前将要打开的应用是否跟之前的应用包名不一样,如果不一样,则将之前的应用锁重置
                 //如果应用包名一样,再判断锁是否超时,如果超时,则也要将应用锁重置,超时时间为5分钟
                 if (!TextUtils.equals(mCurrentPackage, mTargetPackage)) {
@@ -69,12 +80,7 @@ public class LockService extends AccessibilityService {
                     PreferenceUtils.putBoolean(this, mTargetPackage, false);
                     PreferenceUtils.putLong(this, mTargetPackage + "time", System.currentTimeMillis());
                 }
-                //过滤掉像系统锁屏界面/launcher等
-                for (int i = 0; i < mFilterPackage.length; i++) {
-                    if (TextUtils.equals(mCurrentPackage, mFilterPackage[i])) {
-                        return;
-                    }
-                }
+
                 //如果不在加锁列表中,也不需要处理
                 if (!checkInList(mCurrentPackage)) {
                     return;
