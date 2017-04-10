@@ -8,9 +8,9 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_man_new"
+        android:icon="@drawable/ic_monkey_king"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_man_new"
+        android:roundIcon="@drawable/ic_monkey_king"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -49,6 +49,12 @@
 
         <activity
             android:name=".activity.UnlockByGestureActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/FullScreenTheme"/>
+
+        <activity
+            android:name=".activity.UnlockByNumberActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/FullScreenTheme"/>
