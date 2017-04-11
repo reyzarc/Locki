@@ -1,10 +1,12 @@
 package com.xtec.locki.activity;
 
 
+import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
@@ -58,6 +60,7 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
     private FingerprintManagerCompat mFingerprintManager = FingerprintManagerCompat.from(this);
     private static final int HTTP_LOGIN_OUT = 21;
     private CancellationSignal mCancellationSignal;
+    private Vibrator mVibrator;
 
     private Handler handler = new Handler() {
         @Override
@@ -72,6 +75,7 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_gesture);
+        mVibrator = (Vibrator) getApplication().getSystemService(Service.VIBRATOR_SERVICE);
         ObtainExtraData();
         setUpViews();
         setUpListeners();
@@ -159,6 +163,8 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
         @Override
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
+            //停止1秒，开启震动10秒，然后又停止1秒，又开启震动10秒，不重复.
+            mVibrator.vibrate(new long[]{0, 30, 0, 0}, -1);
             //发送认证成功的广播
             Intent intent = new Intent();
             intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
@@ -261,5 +267,11 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
     @Override
     public void onBackPressed() {
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mVibrator.cancel();
     }
 }

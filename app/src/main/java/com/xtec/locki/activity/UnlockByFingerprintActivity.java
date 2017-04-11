@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,7 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
     private CancellationSignal mCancellationSignal;
 
     private String packageName;
+    private Vibrator mVibrator;
 
     private Handler handler = new Handler() {
         @Override
@@ -55,6 +57,7 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_fingerprint);
+        mVibrator = (Vibrator) getApplication().getSystemService(VIBRATOR_SERVICE);
         ButterKnife.bind(this);
     }
 
@@ -142,6 +145,7 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
             Log.e("reyzarc", "指纹认证成功....");
+            mVibrator.vibrate(new long[]{0, 30, 0, 0}, -1);
             //发送认证成功的广播
             Intent intent = new Intent();
             intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
@@ -169,5 +173,6 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
             mCancellationSignal.cancel();
             mCancellationSignal = null;
         }
+        mVibrator.cancel();
     }
 }
