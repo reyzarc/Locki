@@ -17,4 +17,6 @@
     <color name="grey_a5a5a5">#a5a5a5</color>
     <color name="grey_dde1e7">#dde1e7</color>
     <color name="red_f4333c">#f4333c</color>
+    <color name="number_lock_bg">#85060606</color>
+    <color name="transparent">#00000000</color>
 </resources>
