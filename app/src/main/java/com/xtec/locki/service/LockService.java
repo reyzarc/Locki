@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.google.gson.Gson;
@@ -15,6 +14,7 @@ import com.xtec.locki.Constant;
 import com.xtec.locki.activity.UnlockByFingerprintActivity;
 import com.xtec.locki.activity.UnlockByGestureActivity;
 import com.xtec.locki.activity.UnlockByNumberActivity;
+import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class LockService extends AccessibilityService {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
                 mWindowClassName = event.getClassName();
                 mCurrentPackage = event.getPackageName() == null ? "" : event.getPackageName().toString();
-                Log.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
+                L.e("reyzarc", mCurrentPackage + "目标包名是---->" + mTargetPackage);
 
 
                 //过滤掉像系统锁屏界面/launcher,输入法等
@@ -158,7 +158,7 @@ public class LockService extends AccessibilityService {
             String action = intent.getAction();
             String packageName = intent.getStringExtra(Constant.PACKAGE_NAME);
             if (!TextUtils.isEmpty(action) && TextUtils.equals(action, Constant.ACTION_UNLOCK_SUCCESS)) {//解锁成功
-                Log.e("reyzarc", "解锁成功....." + packageName);
+                L.e("reyzarc", "解锁成功....." + packageName);
                 PreferenceUtils.putBoolean(LockService.this, packageName, true);
                 //保存时间,以当前加锁应用的包名为key
                 PreferenceUtils.putLong(LockService.this,packageName+"time", System.currentTimeMillis());
@@ -178,10 +178,10 @@ public class LockService extends AccessibilityService {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals("android.intent.action.SCREEN_ON")) {//亮屏
-                Log.e("reyzarc", "—— SCREEN_ON ——");
+                L.e("reyzarc", "—— SCREEN_ON ——");
             } else if (action.equals("android.intent.action.SCREEN_OFF")) {//熄屏
                 //将锁重置为未解锁状态
-                Log.e("reyzarc", "—— SCREEN_OFF ——" + mTargetPackage);
+                L.e("reyzarc", "—— SCREEN_OFF ——" + mTargetPackage);
                 if (!TextUtils.isEmpty(mTargetPackage)) {
                     PreferenceUtils.putBoolean(LockService.this, mTargetPackage, false);
                 }

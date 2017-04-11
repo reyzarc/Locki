@@ -44,19 +44,19 @@ public class AppUtil {
 		int accessibilityEnabled = 0;
 		// TestService为对应的服务
 		final String service = mContext.getPackageName() + "/" + serviceClass.getCanonicalName();
-		Log.i(TAG, "service:" + service);
+		L.i(TAG, "service:" + service);
 		// com.z.buildingaccessibilityservices/android.accessibilityservice.AccessibilityService
 		try {
 			accessibilityEnabled = Settings.Secure.getInt(mContext.getApplicationContext().getContentResolver(),
 					android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-			Log.v(TAG, "accessibilityEnabled = " + accessibilityEnabled);
+			L.v(TAG, "accessibilityEnabled = " + accessibilityEnabled);
 		} catch (Settings.SettingNotFoundException e) {
-			Log.e(TAG, "Error finding setting, default accessibility to not found: " + e.getMessage());
+			L.e(TAG, "Error finding setting, default accessibility to not found: " + e.getMessage());
 		}
 		TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
 		if (accessibilityEnabled == 1) {
-			Log.v(TAG, "***ACCESSIBILITY IS ENABLED*** -----------------");
+			L.v(TAG, "***ACCESSIBILITY IS ENABLED*** -----------------");
 			String settingValue = Settings.Secure.getString(mContext.getApplicationContext().getContentResolver(),
 					Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
 			// com.z.buildingaccessibilityservices/com.z.buildingaccessibilityservices.TestService
@@ -65,15 +65,15 @@ public class AppUtil {
 				while (mStringColonSplitter.hasNext()) {
 					String accessibilityService = mStringColonSplitter.next();
 
-					Log.v(TAG, "-------------- > accessibilityService :: " + accessibilityService + " " + service);
+					L.v(TAG, "-------------- > accessibilityService :: " + accessibilityService + " " + service);
 					if (accessibilityService.equalsIgnoreCase(service)) {
-						Log.v(TAG, "We've found the correct setting - accessibility is switched on!");
+						L.v(TAG, "We've found the correct setting - accessibility is switched on!");
 						return true;
 					}
 				}
 			}
 		} else {
-			Log.v(TAG, "***ACCESSIBILITY IS DISABLED***");
+			L.v(TAG, "***ACCESSIBILITY IS DISABLED***");
 		}
 		return false;
 	}
@@ -86,7 +86,7 @@ public class AppUtil {
 	 */
 	public static boolean isRunningForeground(Context context,String packageName) {
 		String topActivityClassName = getTopActivityName(context);
-		Log.e("gesture",packageName+"--->"+topActivityClassName);
+		L.e("gesture",packageName+"--->"+topActivityClassName);
 		if (!TextUtils.isEmpty(packageName) && !TextUtils.isEmpty(topActivityClassName)
 				&& topActivityClassName.startsWith(packageName)) {
 			return true;

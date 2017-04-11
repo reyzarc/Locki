@@ -8,7 +8,6 @@ import android.os.Vibrator;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
+import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.widget.FastDialog;
 
@@ -144,7 +144,7 @@ public class UnlockByFingerprintActivity extends AppCompatActivity implements Vi
         @Override
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
-            Log.e("reyzarc", "指纹认证成功....");
+            L.e("reyzarc", "指纹认证成功....");
             mVibrator.vibrate(new long[]{0, 30, 0, 0}, -1);
             //发送认证成功的广播
             Intent intent = new Intent();

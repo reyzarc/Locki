@@ -13,4 +13,5 @@
     <string name="create_gesture_less_error">至少连接4个点,请重新输入</string>
     <string name="create_gesture_confirm_error">与上次绘制不一致,请重新绘制</string>
     <string name="create_gesture_confirm_correct">设置成功</string>
+    <string name="date_and_week">%1$s月%2$s日 星期%3$s</string>
 </resources>

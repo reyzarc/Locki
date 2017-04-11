@@ -1,10 +1,10 @@
 package com.xtec.locki.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -14,8 +14,11 @@ import android.widget.TextView;
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.adapter.NumberKeyboardAdapter;
+import com.xtec.locki.utils.DateUtils;
+import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
+import com.xtec.locki.widget.BlurredView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +26,6 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by 武昌丶鱼 on 2017/3/24.
@@ -45,21 +47,30 @@ public class UnlockByNumberActivity extends AppCompatActivity {
     CheckBox checkbox4;
     @BindView(R.id.grid_view)
     GridView gridView;
-    @BindView(R.id.tv_emergency)
-    TextView tvEmergency;
-    @BindView(R.id.tv_delete)
-    TextView tvDelete;
+    @BindView(R.id.blur_view)
+    BlurredView blurView;
 
     private ArrayList<Map<String, String>> mKeysList = new ArrayList<>();
     private int count = 0;//记录输入的次数
     private StringBuffer mPwd;
+
+    private String packageName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock_by_number_password);
         ButterKnife.bind(this);
+        blurView.setBlurredLevel(100);
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tvTime.setText(DateUtils.FormatStringTimeHM(System.currentTimeMillis()));
+        tvDate.setText(DateUtils.getDate(this));
+        packageName = PreferenceUtils.getString(this, Constant.PACKAGE_NAME);
     }
 
     private void initView() {
@@ -83,7 +94,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.e("reyzarc", "点击了----->" + mKeysList.get(i).get("num"));
+                L.e("reyzarc", "点击了----->" + mKeysList.get(i).get("num"));
                 if (i == 11) {//点击了删除按钮
                     if (count != 0) {
                         count--;
@@ -121,12 +132,16 @@ public class UnlockByNumberActivity extends AppCompatActivity {
                     switch (count % 4) {
                         case 1:
                             checkbox1.setChecked(true);
+                            blurView.setBlurredLevel(90);
                             break;
                         case 2:
                             checkbox2.setChecked(true);
+                            blurView.setBlurredLevel(80);
+
                             break;
                         case 3:
                             checkbox3.setChecked(true);
+                            blurView.setBlurredLevel(70);
                             break;
                         case 0:
                             checkbox4.setChecked(true);
@@ -140,26 +155,30 @@ public class UnlockByNumberActivity extends AppCompatActivity {
     }
 
     private void checkPwd(String pwd) {
-        if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
-            T.showShort(this, "解锁成功...");
+        L.e("reyzarc","输入的密码是---->"+pwd);
+//        if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
+        if (TextUtils.equals(pwd, "4568")) {
+            //发送认证成功的广播
+            Intent intent = new Intent();
+            intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
+            intent.putExtra(Constant.PACKAGE_NAME, packageName);
+            sendBroadcast(intent);
+            finish();
+            overridePendingTransition(R.anim.right_in,R.anim.right_out);
         } else {
             T.showShort(this, "密码错误!");
         }
         mPwd.setLength(0);
-        count=0;
+        count = 0;
         checkbox4.setChecked(false);
         checkbox3.setChecked(false);
         checkbox2.setChecked(false);
         checkbox1.setChecked(false);
+        blurView.setBlurredLevel(100);
     }
 
-    @OnClick({R.id.tv_emergency, R.id.tv_delete})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_emergency://紧急呼叫
-                break;
-            case R.id.tv_delete://删除
-                break;
-        }
+
+    @Override
+    public void onBackPressed() {
     }
 }

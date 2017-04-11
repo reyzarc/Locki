@@ -12,7 +12,6 @@ import android.support.annotation.IdRes;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RadioButton;
@@ -26,6 +25,7 @@ import com.xtec.locki.adapter.BrowseApplicationInfoAdapter;
 import com.xtec.locki.model.AppInfo;
 import com.xtec.locki.service.LockService;
 import com.xtec.locki.utils.AppUtil;
+import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.widget.FastDialog;
 
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         super.onStop();
         Gson gson = new Gson();
         String str = gson.toJson(mLockList);
-        Log.e("reyzarc", "数据是---->" + str);
+        L.e("reyzarc", "数据是---->" + str);
         if (!TextUtils.isEmpty(str)) {
             PreferenceUtils.putString(this, Constant.LOCK_LIST, str);
             sendBroadcast(new Intent(Constant.ACTION_UPDATE_UNLOCK_LIST));
