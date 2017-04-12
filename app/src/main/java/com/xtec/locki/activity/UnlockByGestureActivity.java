@@ -164,6 +164,9 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
             //停止1秒，开启震动10秒，然后又停止1秒，又开启震动10秒，不重复.
+            if (mVibrator == null) {
+                mVibrator = (Vibrator) getApplication().getSystemService(Service.VIBRATOR_SERVICE);
+            }
             mVibrator.vibrate(new long[]{0, 30, 0, 0}, -1);
             //发送认证成功的广播
             Intent intent = new Intent();

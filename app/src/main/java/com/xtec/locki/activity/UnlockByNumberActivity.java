@@ -1,8 +1,12 @@
 package com.xtec.locki.activity;
 
+import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.os.CancellationSignal;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -55,6 +59,10 @@ public class UnlockByNumberActivity extends AppCompatActivity {
     private StringBuffer mPwd;
 
     private String packageName;
+    private FingerprintManagerCompat mFingerprintManager = FingerprintManagerCompat.from(this);
+    private static final int HTTP_LOGIN_OUT = 21;
+    private CancellationSignal mCancellationSignal;
+    private Vibrator mVibrator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,7 +70,11 @@ public class UnlockByNumberActivity extends AppCompatActivity {
         setContentView(R.layout.activity_unlock_by_number_password);
         ButterKnife.bind(this);
         blurView.setBlurredLevel(100);
+        mVibrator = (Vibrator) getApplication().getSystemService(Service.VIBRATOR_SERVICE);
         initView();
+        if (supportFingerprint()) {//支持指纹解锁
+            unlockByFingerprint();
+        }
     }
 
     @Override
@@ -95,9 +107,14 @@ public class UnlockByNumberActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 L.e("reyzarc", "点击了----->" + mKeysList.get(i).get("num"));
+                if (i == 9) {//无按键
+                    return;
+                }
                 if (i == 11) {//点击了删除按钮
                     if (count != 0) {
                         count--;
+                        L.e("reyzarc", "count----->" + count + "======>" + (4 - count % 4));
+
                         //判断回退了几个
                         if (mPwd == null) {
                             return;
@@ -116,7 +133,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
                                 checkbox3.setChecked(false);
                                 checkbox2.setChecked(false);
                                 break;
-                            case 0:
+                            case 4:
                                 checkbox4.setChecked(false);
                                 checkbox3.setChecked(false);
                                 checkbox2.setChecked(false);
@@ -155,7 +172,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
     }
 
     private void checkPwd(String pwd) {
-        L.e("reyzarc","输入的密码是---->"+pwd);
+        L.e("reyzarc", "输入的密码是---->" + pwd);
 //        if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
         if (TextUtils.equals(pwd, "4568")) {
             //发送认证成功的广播
@@ -164,7 +181,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
             intent.putExtra(Constant.PACKAGE_NAME, packageName);
             sendBroadcast(intent);
             finish();
-            overridePendingTransition(R.anim.right_in,R.anim.right_out);
+            overridePendingTransition(R.anim.right_in, R.anim.right_out);
         } else {
             T.showShort(this, "密码错误!");
         }
@@ -180,5 +197,110 @@ public class UnlockByNumberActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+    }
+
+    //判断手机是否支持指纹解锁
+    private boolean supportFingerprint() {
+        FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(this);
+        if (!fingerprintManager.isHardwareDetected()) {//不支持指纹
+            return false;
+        } else {//支持指纹识别
+            return true;
+        }
+    }
+
+    private void unlockByFingerprint() {
+        //判断是否添加过指纹
+//        if (!mFingerprintManager.hasEnrolledFingerprints()) {//没有添加过指纹
+//            new FastDialog(this)
+//                    .setContent("你尚未设置过指纹,请前往手机系统\n'设置'>指纹功能中添加指纹")
+//                    .setPositiveButton("确定", new FastDialog.OnClickListener() {
+//                        @Override
+//                        public void onClick(FastDialog dialog) {
+//
+//                        }
+//                    })
+//                    .setNegativeButton("取消", new FastDialog.OnClickListener() {
+//                        @Override
+//                        public void onClick(FastDialog dialog) {
+//
+//                        }
+//                    }).create().show();
+//
+//            return;
+//        }
+
+//        new FastDialog(this)
+//                .setContent("请通过指纹识别器验证\n已录入的指纹")
+//                .setPositiveButton("确定", new FastDialog.OnClickListener() {
+//                    @Override
+//                    public void onClick(FastDialog dialog) {
+//
+//                    }
+//                })
+//                .setNegativeButton("取消", new FastDialog.OnClickListener() {
+//                    @Override
+//                    public void onClick(FastDialog dialog) {
+//                        if(mCancellationSignal!=null){
+//                            mCancellationSignal.cancel();
+//                        }
+//                    }
+//                }).create().show();
+        if (mCancellationSignal != null)
+            mCancellationSignal.cancel();
+        mCancellationSignal = new CancellationSignal();
+        mFingerprintManager.authenticate(null, 0, mCancellationSignal, new MyCallBack(), null);
+
+    }
+
+    private class MyCallBack extends FingerprintManagerCompat.AuthenticationCallback {
+        private static final String TAG = "MyCallBack";
+
+        @Override
+        public void onAuthenticationError(int errMsgId, CharSequence errString) {
+            super.onAuthenticationError(errMsgId, errString);
+//            AndroidUtils.Toast(this, ""+errString);
+//            handler.sendMessageDelayed(new Message(), 1000 * 30);
+//            logout();
+        }
+
+        @Override
+        public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
+            super.onAuthenticationHelp(helpMsgId, helpString);
+        }
+
+        @Override
+        public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
+            super.onAuthenticationSucceeded(result);
+            //停止1秒，开启震动10秒，然后又停止1秒，又开启震动10秒，不重复.
+            if (mVibrator == null) {
+                mVibrator = (Vibrator) getApplication().getSystemService(Service.VIBRATOR_SERVICE);
+            }
+            mVibrator.vibrate(new long[]{0, 30, 0, 0}, -1);
+
+            //发送认证成功的广播
+            Intent intent = new Intent();
+            intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
+            intent.putExtra(Constant.PACKAGE_NAME, packageName);
+            sendBroadcast(intent);
+            finish();
+            overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
+        }
+
+        @Override
+        public void onAuthenticationFailed() {
+            super.onAuthenticationFailed();
+//            AndroidUtils.Toast(UnlockByFingerprintAct.this, "指纹认证失败,请重试");
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mVibrator.cancel();
+        if (mCancellationSignal != null) {
+            mCancellationSignal.cancel();
+            mCancellationSignal = null;
+        }
     }
 }
