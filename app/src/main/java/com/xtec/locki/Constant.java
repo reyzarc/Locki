@@ -55,6 +55,7 @@ public class Constant {
      * 数字密码
      */
     public static final String NUMBER_PASSWORD = "number_password";
+    public static final String SAFEGUARD_PASSWORD = "safeguard_password";
     /**
      * 手势密码结果标识
      */
@@ -63,4 +64,13 @@ public class Constant {
      * 数字密码结果标识
      */
     public static final int RESULT_NUMBER = 1;
+    /**
+     * 设置密码结果标识
+     */
+    public static final int RESULT_SAFEGUARD = 2;
+    /**
+     * 验证密码结果标识
+     */
+    public static final int RESULT_VERIFY = 3;
+    public static final String IS_FIRST = "isFirst";
 }

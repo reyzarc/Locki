@@ -31,6 +31,7 @@ import com.xtec.locki.service.LockService;
 import com.xtec.locki.utils.AppUtil;
 import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
+import com.xtec.locki.utils.T;
 import com.xtec.locki.widget.FastDialog;
 import com.xtec.locki.widget.MultiStateView;
 
@@ -71,11 +72,12 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     private Gson mGson;
     private final int REQUEST_GESTURE = 1;
     private final int REQUEST_NUMBER = 2;
+    private final int REQUEST_SAFEGUARD = 3;
+    private final int REQUEST_VERIFY = 4;
     private String mLockMethod;
 
     private DevicePolicyManager devicePolicyManager;
     public ComponentName componentName;//权限监听器
-    private boolean flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +85,16 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initToolBar(toolbar, false);
+        //判断是否是第一次打开应用,如果是第一次,则引导用户设置保护密码
+        if (PreferenceUtils.getBoolean(this, Constant.IS_FIRST, true)) {//第一次
+            startActivityForResult(new Intent(this, SafeguardActivity.class), REQUEST_SAFEGUARD);
+        } else {//不是第一次,则需要验证身份才能进入应用
+            startActivityForResult(new Intent(this, VerifyIdentityActivity.class), REQUEST_VERIFY);
+        }
+
         //检查是否激活了设备管理器,防止应用被卸载
         devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
-        componentName =  new ComponentName(this,DeviceManager.class);//用广播接收器实例化一个系统组件
+        componentName = new ComponentName(this, DeviceManager.class);//用广播接收器实例化一个系统组件
 
         mGson = new Gson();
         pm = getPackageManager();
@@ -176,9 +185,9 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
     private void checkDeviceEnable() {
         boolean flagChanged = devicePolicyManager.isAdminActive(componentName);//判断这个应用是否激活了设备管理器
-        if(flagChanged){
+        if (flagChanged) {
 
-        }else{
+        } else {
             showEnableDialog();
         }
     }
@@ -292,7 +301,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 //显示内容
                 mvState.setViewState(MultiStateView.VIEW_STATE_CONTENT);
             }
-        },5000);
+        }, 5000);
 
     }
 
@@ -445,6 +454,35 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                             mLockMethod = Constant.NUMBER;
                             PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER);
                             rbNumberPwd.setChecked(true);
+                            break;
+                    }
+                }
+            }
+        } else if (requestCode == REQUEST_SAFEGUARD && resultCode == Constant.RESULT_SAFEGUARD) {
+            if (data != null) {
+                String str = data.getStringExtra("status");
+                if (!TextUtils.isEmpty(str)) {
+                    switch (str) {
+                        case "cancel"://取消
+                            finish();
+                            break;
+                        case "success"://成功
+                            PreferenceUtils.putBoolean(this,Constant.IS_FIRST,false);
+                            T.showShort(this, "设置成功");
+                            break;
+                    }
+                }
+            }
+        } else if (requestCode == REQUEST_VERIFY && resultCode == Constant.RESULT_VERIFY) {
+            if (data != null) {
+                String str = data.getStringExtra("status");
+                if (!TextUtils.isEmpty(str)) {
+                    switch (str) {
+                        case "cancel"://取消
+                            finish();
+                            break;
+                        case "success"://成功
+                            T.showShort(this, "验证成功");
                             break;
                     }
                 }

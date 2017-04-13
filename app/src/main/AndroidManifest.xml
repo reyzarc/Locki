@@ -70,6 +70,12 @@
         <activity
             android:name=".activity.CreateNumberPwdActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.SafeguardActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.VerifyIdentityActivity"
+            android:screenOrientation="portrait"/>
 
         <receiver android:name=".service.DeviceManager"
                   android:permission="android.permission.BIND_DEVICE_ADMIN">
