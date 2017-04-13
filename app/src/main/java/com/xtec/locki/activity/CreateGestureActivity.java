@@ -1,5 +1,6 @@
 package com.xtec.locki.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -83,6 +84,9 @@ public class CreateGestureActivity extends AppCompatActivity implements View.OnC
                         mGestureContentView.clearDrawlineState(0L);
                         //保存选中的状态
                         PreferenceUtils.putString(CreateGestureActivity.this, Constant.LOCK_METHOD, Constant.GESTURE);
+                        Intent intent = new Intent();
+                        intent.putExtra("status","success");
+                        setResult(Constant.RESULT_GESTURE,intent);
                         finish();
                     } else {
                         mTextTip.setText(Html.fromHtml("<font color='#c70c1e'>与上一次绘制不一致，请重新绘制</font>"));
@@ -132,6 +136,9 @@ public class CreateGestureActivity extends AppCompatActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.text_cancel:
+                Intent intent = new Intent();
+                intent.putExtra("status","cancel");
+                setResult(Constant.RESULT_GESTURE,intent);
                 this.finish();
                 break;
             case R.id.text_reset:

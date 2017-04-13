@@ -16,7 +16,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -39,26 +40,36 @@
                 android:resource="@xml/accessibility"/>
         </service>
 
-        <activity android:name=".activity.LockActivity"/>
-        <activity android:name=".activity.CreateGestureActivity"/>
+        <activity android:name=".activity.LockActivity"
+                  android:screenOrientation="portrait"/>
         <activity android:name=".activity.CreateGestureActivityNew"/>
         <activity
             android:name=".activity.UnlockByFingerprintActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme"/>
 
         <activity
             android:name=".activity.UnlockByGestureActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme"/>
 
         <activity
             android:name=".activity.UnlockByNumberActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme"/>
+        <activity
+            android:name=".activity.CreateGestureActivity"
+            android:theme="@style/FullScreenTheme"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.CreateNumberPwdActivity"
+            android:screenOrientation="portrait"/>
 
     </application>
 

@@ -171,15 +171,14 @@ public class UnlockByNumberActivity extends AppCompatActivity {
 
     private void checkPwd(String pwd) {
         L.e("reyzarc", "输入的密码是---->" + pwd);
-//        if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
-        if (TextUtils.equals(pwd, "4568")) {
+        if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
             //发送认证成功的广播
             Intent intent = new Intent();
             intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
             intent.putExtra(Constant.PACKAGE_NAME, packageName);
             sendBroadcast(intent);
             finish();
-            overridePendingTransition(R.anim.right_in, R.anim.right_out);
+            overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
         } else {
             T.showShort(this, "密码错误!");
         }
@@ -282,7 +281,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
             intent.putExtra(Constant.PACKAGE_NAME, packageName);
             sendBroadcast(intent);
             finish();
-            overridePendingTransition(R.anim.right_in, R.anim.right_out);
+            overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
         }
 
         @Override

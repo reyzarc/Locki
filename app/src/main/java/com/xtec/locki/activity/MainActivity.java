@@ -10,12 +10,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -37,7 +38,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.halfbit.pinnedsection.PinnedSectionListView;
 
-public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener, AdapterView.OnItemClickListener {
+public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener, AdapterView.OnItemClickListener {
 
     @BindView(R.id.rb_fingerprint)
     RadioButton rbFingerprint;
@@ -49,6 +50,10 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     RadioGroup radioGroup;
     @BindView(R.id.lv)
     PinnedSectionListView lv;
+    @BindView(R.id.toolbar_title)
+    TextView toolbarTitle;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private List<AppInfo> mListAppInfo = null;
     private PackageManager pm;
@@ -58,12 +63,16 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     private FastDialog mDialog;
     private Gson mGson;
+    private final int REQUEST_GESTURE = 1;
+    private final int REQUEST_NUMBER = 2;
+    private String mLockMethod;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        initToolBar(toolbar,false);
         mGson = new Gson();
         pm = getPackageManager();
 
@@ -101,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         }
 
         radioGroup.setOnCheckedChangeListener(this);
-        PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT);
+        //获取保存的解锁方式,没有保存则默认数字
+        mLockMethod = PreferenceUtils.getString(this, Constant.LOCK_METHOD, Constant.NUMBER);
         startService(new Intent(this, LockService.class));
 
 //        queryAppInfo(); // 查询所有应用程序信息
@@ -254,15 +264,17 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
         switch (i) {
             case R.id.rb_fingerprint://指纹解锁
+                mLockMethod = Constant.FINGERPRINT;
                 PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT);
                 break;
             case R.id.rb_gesture_pwd://手势密码解锁
-                startActivity(new Intent(this, CreateGestureActivity.class));
+                startActivityForResult(new Intent(this, CreateGestureActivity.class), REQUEST_GESTURE);
 //                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE, true);
                 break;
             case R.id.rb_number_pwd://数字密码解锁
-            default:
-                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER);
+                startActivityForResult(new Intent(this, CreateNumberPwdActivity.class), REQUEST_NUMBER);
+//                mLockMethod = Constant.NUMBER;
+//                PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER);
                 break;
         }
     }
@@ -332,5 +344,58 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             sendBroadcast(new Intent(Constant.ACTION_UPDATE_UNLOCK_LIST));
         }
         super.onStop();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_GESTURE && resultCode == Constant.RESULT_GESTURE) {
+            if (data != null) {
+                String str = data.getStringExtra("status");
+                if (!TextUtils.isEmpty(str)) {
+                    switch (str) {
+                        case "cancel"://取消
+                            //还原状态
+                            switch (mLockMethod) {
+                                case Constant.NUMBER:
+                                    rbNumberPwd.setChecked(true);
+                                    break;
+                                case Constant.FINGERPRINT:
+                                    rbFingerprint.setChecked(true);
+                                    break;
+                            }
+                            break;
+                        case "success"://成功
+                            mLockMethod = Constant.GESTURE;
+                            PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE);
+                            rbGesturePwd.setChecked(true);
+                            break;
+                    }
+                }
+            }
+        }else if (requestCode == REQUEST_NUMBER && resultCode == Constant.RESULT_NUMBER) {
+            if (data != null) {
+                String str = data.getStringExtra("status");
+                if (!TextUtils.isEmpty(str)) {
+                    switch (str) {
+                        case "cancel"://取消
+                            //还原状态
+                            switch (mLockMethod) {
+                                case Constant.GESTURE:
+                                    rbGesturePwd.setChecked(true);
+                                    break;
+                                case Constant.FINGERPRINT:
+                                    rbFingerprint.setChecked(true);
+                                    break;
+                            }
+                            break;
+                        case "success"://成功
+                            mLockMethod = Constant.NUMBER;
+                            PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER);
+                            rbNumberPwd.setChecked(true);
+                            break;
+                    }
+                }
+            }
+        }
     }
 }

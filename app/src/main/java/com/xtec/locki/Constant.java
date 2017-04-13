@@ -55,4 +55,12 @@ public class Constant {
      * 数字密码
      */
     public static final String NUMBER_PASSWORD = "number_password";
+    /**
+     * 手势密码结果标识
+     */
+    public static final int RESULT_GESTURE = 0;
+    /**
+     * 数字密码结果标识
+     */
+    public static final int RESULT_NUMBER = 1;
 }
