@@ -73,4 +73,8 @@ public class Constant {
      */
     public static final int RESULT_VERIFY = 3;
     public static final String IS_FIRST = "isFirst";
+    /**
+     * 账户错误后锁定时间
+     */
+    public static final String VERIFY_TIME = "verify_time";
 }
