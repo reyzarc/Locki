@@ -44,4 +44,5 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'se.emilsjolander:stickylistheaders:2.7.0'
     compile "de.halfbit:pinned-section-listview:1.0.0"
+    compile 'com.wang.avi:library:2.1.3'
 }

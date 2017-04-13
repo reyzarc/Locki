@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
@@ -29,6 +30,7 @@ import com.xtec.locki.utils.AppUtil;
 import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.widget.FastDialog;
+import com.xtec.locki.widget.MultiStateView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +56,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     TextView toolbarTitle;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.mv_state)
+    MultiStateView mvState;
 
     private List<AppInfo> mListAppInfo = null;
     private PackageManager pm;
@@ -72,7 +76,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        initToolBar(toolbar,false);
+        initToolBar(toolbar, false);
         mGson = new Gson();
         pm = getPackageManager();
 
@@ -241,6 +245,15 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 }
             }
         }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //显示内容
+                mvState.setViewState(MultiStateView.VIEW_STATE_CONTENT);
+            }
+        },5000);
+
     }
 
     /**
@@ -372,7 +385,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                     }
                 }
             }
-        }else if (requestCode == REQUEST_NUMBER && resultCode == Constant.RESULT_NUMBER) {
+        } else if (requestCode == REQUEST_NUMBER && resultCode == Constant.RESULT_NUMBER) {
             if (data != null) {
                 String str = data.getStringExtra("status");
                 if (!TextUtils.isEmpty(str)) {

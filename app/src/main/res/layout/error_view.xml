@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_margin="16dp"
+        android:text="加载失败"
+        android:textColor="@color/gray"
+        android:textSize="18sp"/>
+
+    <Button
+        android:id="@+id/btn_refresh"
+        style="@style/orange_btn_style"
+        android:text="点击刷新"/>
+
+
+</LinearLayout>
