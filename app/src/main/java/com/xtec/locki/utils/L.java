@@ -44,7 +44,7 @@ public class L {
 
     public static void e(Class<?> _class, String msg) {
         if (isDebug)
-            Log.i(_class.getName(), msg);
+            Log.e(_class.getName(), msg);
     }
 
     public static void v(Class<?> _class, String msg) {
@@ -65,7 +65,7 @@ public class L {
 
     public static void e(String tag, String msg) {
         if (isDebug)
-            Log.i(tag, msg);
+            Log.e(tag, msg);
     }
 
     public static void v(String tag, String msg) {

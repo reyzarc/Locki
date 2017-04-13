@@ -113,8 +113,6 @@ public class UnlockByNumberActivity extends AppCompatActivity {
                 if (i == 11) {//点击了删除按钮
                     if (count != 0) {
                         count--;
-                        L.e("reyzarc", "count----->" + count + "======>" + (4 - count % 4));
-
                         //判断回退了几个
                         if (mPwd == null) {
                             return;
@@ -284,7 +282,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
             intent.putExtra(Constant.PACKAGE_NAME, packageName);
             sendBroadcast(intent);
             finish();
-            overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
+            overridePendingTransition(R.anim.right_in, R.anim.right_out);
         }
 
         @Override

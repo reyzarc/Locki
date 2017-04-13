@@ -50,17 +50,22 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     @BindView(R.id.lv)
     PinnedSectionListView lv;
 
-    private List<AppInfo> mlistAppInfo = null;
+    private List<AppInfo> mListAppInfo = null;
     private PackageManager pm;
 
     private List<String> mLockList = new ArrayList<>();
     private boolean hasList;
+
+    private FastDialog mDialog;
+    private Gson mGson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mGson = new Gson();
+        pm = getPackageManager();
 
         //判断手机是否支持指纹解锁
         FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(this);
@@ -70,30 +75,45 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             rbFingerprint.setVisibility(View.VISIBLE);
         }
 
+        mListAppInfo = new ArrayList<>();
+
         //获取之前保存的列表
         String str = PreferenceUtils.getString(this, Constant.LOCK_LIST);
         if (!TextUtils.isEmpty(str)) {
             hasList = true;
-            Gson gson = new Gson();
-            mLockList = gson.fromJson(str, new TypeToken<List<String>>() {
+            mLockList = mGson.fromJson(str, new TypeToken<List<String>>() {
             }.getType());
+            L.e("reyzarc", "lock list is---->" + mLockList.toString());
+            //将加锁的列表显示在最前端
+            mListAppInfo.clear();
+            AppInfo appTitle = new AppInfo();
+            appTitle.setAppLabel("已加锁应用");
+            appTitle.setType(AppInfo.SECTION);
+            mListAppInfo.add(appTitle);
+            for (int i = 0; i < mLockList.size(); i++) {
+                ApplicationInfo info = AppUtil.getAppInfoByPackageName(this, mLockList.get(i));
+                if (info != null) {
+                    AppInfo appInfo = getAppInfo(info);
+                    appInfo.setOpened(true);
+                    mListAppInfo.add(appInfo);
+                }
+            }
         }
 
         radioGroup.setOnCheckedChangeListener(this);
         PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.FINGERPRINT);
         startService(new Intent(this, LockService.class));
 
-        mlistAppInfo = new ArrayList<>();
 //        queryAppInfo(); // 查询所有应用程序信息
 //        queryAllAppInfo();//查询所有应用信息
         queryCustomAppInfo();//查询用户安装的应用
         BrowseApplicationInfoAdapter browseAppAdapter = new BrowseApplicationInfoAdapter(
-                this, mlistAppInfo, new BrowseApplicationInfoAdapter.OnStatusChangedListener() {
+                this, mListAppInfo, new BrowseApplicationInfoAdapter.OnStatusChangedListener() {
             @Override
             public void onStatusChange(AppInfo appInfo) {
-                if (appInfo.isOpened()) {
+                if (appInfo.isOpened()) {//开启锁
                     mLockList.add(appInfo.getPkgName());
-                } else {
+                } else {//关闭锁
                     mLockList.remove(appInfo.getPkgName());
                 }
             }
@@ -111,7 +131,10 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     private void checkServiceEnable() {
         if (!AppUtil.isAccessibilitySettingsOn(this, LockService.class)) {
-            new FastDialog(this)
+            if (mDialog != null && mDialog.isShowing()) {
+                return;
+            }
+            mDialog = new FastDialog(this)
                     .setTitle("提示")
                     .setContent("应用锁需要开启辅助功能才能正常运行,请前往设置->无障碍或者设置->高级->辅助功能中,找到LockService并开启)")
                     .setPositiveButton("前往设置", new FastDialog.OnClickListener() {
@@ -127,7 +150,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                         public void onClick(FastDialog dialog) {
                             finish();
                         }
-                    }).create().show();
+                    }).create();
+            mDialog.show();
         }
     }
 
@@ -137,27 +161,36 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private void queryCustomAppInfo() {
         pm = this.getPackageManager();
         // 查询所有已经安装的应用程序
-        List<ApplicationInfo> listAppcations = pm
+        List<ApplicationInfo> listApplications = pm
                 .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
-        Collections.sort(listAppcations,
+        Collections.sort(listApplications,
                 new ApplicationInfo.DisplayNameComparator(pm));// 排序
-        mlistAppInfo.clear();
+        if (!hasList) {
+            mListAppInfo.clear();
+        }
         AppInfo appTitle = new AppInfo();
         appTitle.setAppLabel("用户安装");
         appTitle.setType(AppInfo.SECTION);
-        mlistAppInfo.add(appTitle);
-        for (ApplicationInfo app : listAppcations) {
+        mListAppInfo.add(appTitle);
+        for (ApplicationInfo app : listApplications) {
             if ((app.flags & ApplicationInfo.FLAG_SYSTEM) <= 0) {
                 AppInfo appInfo = getAppInfo(app);
-                if (hasList) {
+                boolean isLocked = false;
+                if (hasList) {//有历史加锁列表
                     for (int i = 0; i < mLockList.size(); i++) {
                         if (TextUtils.equals(app.packageName, mLockList.get(i))) {
+                            //当前应用已经在已加锁列表显示,则不再添加到下面
                             appInfo.setOpened(true);
+                            isLocked = true;
                             break;
                         }
                     }
+                    if (!isLocked) {
+                        mListAppInfo.add(appInfo);
+                    }
+                } else {
+                    mListAppInfo.add(appInfo);
                 }
-                mlistAppInfo.add(appInfo);
             }
         }
 
@@ -176,20 +209,26 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         AppInfo appTitle = new AppInfo();
         appTitle.setAppLabel("系统应用");
         appTitle.setType(AppInfo.SECTION);
-        mlistAppInfo.add(appTitle);
+        mListAppInfo.add(appTitle);
         for (ApplicationInfo app : listAppcations) {
             if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
                 //判断以前是否有设置开启过
                 AppInfo appInfo = getAppInfo(app);
+                boolean isLocked = false;
                 if (hasList) {
                     for (int i = 0; i < mLockList.size(); i++) {
                         if (TextUtils.equals(app.packageName, mLockList.get(i))) {
                             appInfo.setOpened(true);
+                            isLocked = true;
                             break;
                         }
                     }
+                    if (!isLocked) {
+                        mListAppInfo.add(appInfo);
+                    }
+                } else {
+                    mListAppInfo.add(appInfo);
                 }
-                mlistAppInfo.add(appInfo);
             }
         }
     }
@@ -205,9 +244,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         Collections.sort(listAppcations,
                 new ApplicationInfo.DisplayNameComparator(pm));// 排序
 
-        mlistAppInfo.clear();
+        mListAppInfo.clear();
         for (ApplicationInfo app : listAppcations) {
-            mlistAppInfo.add(getAppInfo(app));
+            mListAppInfo.add(getAppInfo(app));
         }
     }
 
@@ -232,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     public void onItemClick(AdapterView<?> arg0, View view, int position,
                             long arg3) {
         // TODO Auto-generated method stub
-        if (mlistAppInfo.get(position).getType() == AppInfo.SECTION) {
+        if (mListAppInfo.get(position).getType() == AppInfo.SECTION) {
             return;
         }
 //        Intent intent = mlistAppInfo.get(position).getIntent();
@@ -250,8 +289,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         // 调用系统排序 ， 根据name排序
         // 该排序很重要，否则只能显示系统应用，而不能列出第三方应用程序
         Collections.sort(resolveInfos, new ResolveInfo.DisplayNameComparator(pm));
-        if (mlistAppInfo != null) {
-            mlistAppInfo.clear();
+        if (mListAppInfo != null) {
+            mListAppInfo.clear();
             for (ResolveInfo reInfo : resolveInfos) {
                 String activityName = reInfo.activityInfo.name; // 获得该应用程序的启动Activity的name
                 String pkgName = reInfo.activityInfo.packageName; // 获得应用程序的包名
@@ -267,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 appInfo.setPkgName(pkgName);
                 appInfo.setAppIcon(icon);
                 appInfo.setIntent(launchIntent);
-                mlistAppInfo.add(appInfo); // 添加至列表中
+                mListAppInfo.add(appInfo); // 添加至列表中
             }
         }
     }
@@ -285,13 +324,13 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     @Override
     protected void onStop() {
-        super.onStop();
-        Gson gson = new Gson();
-        String str = gson.toJson(mLockList);
+        L.e("reyzarc", "=======>" + mLockList.toString());
+        String str = mGson.toJson(mLockList);
         L.e("reyzarc", "数据是---->" + str);
         if (!TextUtils.isEmpty(str)) {
             PreferenceUtils.putString(this, Constant.LOCK_LIST, str);
             sendBroadcast(new Intent(Constant.ACTION_UPDATE_UNLOCK_LIST));
         }
+        super.onStop();
     }
 }

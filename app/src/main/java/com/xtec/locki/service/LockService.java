@@ -49,7 +49,7 @@ public class LockService extends AccessibilityService {
      * 不加锁的应用列表
      */
 //    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox", "com.android.systemui", "com.xtec.locki", "com.cyou.privacysecurity"};
-    private String[] mFilterPackage = new String[]{ "com.xtec.locki","com.google.android.inputmethod.pinyin","com.android.systemui","com.iflytek.inputmethod"};
+    private String[] mFilterPackage = new String[]{ "com.xtec.locki","com.google.android.inputmethod.pinyin","com.android.systemui","com.iflytek.inputmethod","com.google.android.packageinstaller"};
     private List<String> mLockList = new ArrayList<>();
 
     @Override
