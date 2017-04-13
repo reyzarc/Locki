@@ -1,5 +1,6 @@
 package com.xtec.locki.activity;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -25,6 +26,7 @@ import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.adapter.BrowseApplicationInfoAdapter;
 import com.xtec.locki.model.AppInfo;
+import com.xtec.locki.service.DeviceManager;
 import com.xtec.locki.service.LockService;
 import com.xtec.locki.utils.AppUtil;
 import com.xtec.locki.utils.L;
@@ -71,12 +73,20 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     private final int REQUEST_NUMBER = 2;
     private String mLockMethod;
 
+    private DevicePolicyManager devicePolicyManager;
+    public ComponentName componentName;//权限监听器
+    private boolean flag;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initToolBar(toolbar, false);
+        //检查是否激活了设备管理器,防止应用被卸载
+        devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        componentName =  new ComponentName(this,DeviceManager.class);//用广播接收器实例化一个系统组件
+
         mGson = new Gson();
         pm = getPackageManager();
 
@@ -136,11 +146,41 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         lv.setOnItemClickListener(this);
     }
 
+    private void showEnableDialog() {
+        new FastDialog(this)
+                .setTitle("激活设备管理器")
+                .setContent("使用锁屏需要激活设备管理器功能,请按提示操作")
+                .setNegativeButton("取消", new FastDialog.OnClickListener() {
+                    @Override
+                    public void onClick(FastDialog dialog) {
+                        finish();
+                    }
+                })
+                .setPositiveButton("去激活", new FastDialog.OnClickListener() {
+                    @Override
+                    public void onClick(FastDialog dialog) {
+                        Intent i = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);//激活系统设备管理器
+                        i.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);//注册系统组件
+                        startActivity(i);
+                    }
+                }).create().show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         //检查辅助功能中的服务是否开启
         checkServiceEnable();
+        checkDeviceEnable();
+    }
+
+    private void checkDeviceEnable() {
+        boolean flagChanged = devicePolicyManager.isAdminActive(componentName);//判断这个应用是否激活了设备管理器
+        if(flagChanged){
+
+        }else{
+            showEnableDialog();
+        }
     }
 
     private void checkServiceEnable() {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <force-lock/> //一键锁屏
+        <disable-camera/> //停用相机，禁止使用所有设备摄像头
+        <!--<limit-password/>//设置密码规则
+        <watch-login/>//监视屏幕解锁尝试次数，如果输错次数过多则锁定手机或者清除所有数据
+        <reset-password/>//重置密码
+        <wipe-data/>//恢复出厂设置-->
+    </uses-policies>
+</device-admin>
