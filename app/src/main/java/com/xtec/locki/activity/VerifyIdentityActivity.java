@@ -102,6 +102,7 @@ public class VerifyIdentityActivity extends BaseActivity {
             timer = null;
         }
         tvVerifyTips.setText("请输入密码验证身份");
+        etPwd.setText("");
         btnConfirm.setEnabled(true);
     }
 
