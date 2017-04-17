@@ -44,20 +44,22 @@ public class VerifyIdentityActivity extends BaseActivity {
     TextView tvVerifyTips;
     //密码验证次数
     private int count = 3;
+    private boolean isLocked;
     //锁定时间,单位秒
     private int seconds = 600;
     private Timer timer;
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
                     seconds--;
                     if (seconds != 0) {
+                        isLocked = true;
                         tvVerifyTips.setText(String.format(getResources().getString(R.string.verify_time), DateUtils.FormatStringTimeMS(seconds)));
                     } else {
-                        btnConfirm.setEnabled(true);
+                        resetStatus();
                     }
                     break;
             }
@@ -76,23 +78,31 @@ public class VerifyIdentityActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        long time = PreferenceUtils.getLong(this,Constant.VERIFY_TIME);
-        long difTime = time-System.currentTimeMillis();
-        L.e("reyzarc",time+"时间差是----->"+difTime+"秒=====>"+difTime/1000);
-        if(difTime > 0){//还未过冻结时间
+        long time = PreferenceUtils.getLong(this, Constant.VERIFY_TIME);
+        long difTime = time - System.currentTimeMillis();
+        L.e("reyzarc", time + "时间差是----->" + difTime + "秒=====>" + difTime / 1000);
+        if (difTime > 0) {//还未过冻结时间
             btnConfirm.setEnabled(false);
-            seconds = (int) (difTime/1000);
+            seconds = (int) (difTime / 1000);
             startTimer();
-        }else{//已经过了冻结时间
-            btnConfirm.setEnabled(true);
-            seconds = 600;
-            count = 3;
-            if(timer!=null){
-                timer.cancel();
-                timer = null;
-            }
-            tvVerifyTips.setText("请输入密码验证身份");
+        } else {//已经过了冻结时间
+            resetStatus();
         }
+    }
+
+    /**
+     * 还原状态
+     */
+    private void resetStatus() {
+        isLocked = false;
+        seconds = 600;
+        count = 3;
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        tvVerifyTips.setText("请输入密码验证身份");
+        btnConfirm.setEnabled(true);
     }
 
     @Override
@@ -125,13 +135,13 @@ public class VerifyIdentityActivity extends BaseActivity {
             setResult(Constant.RESULT_VERIFY, intent);
             finish();
         } else {
-            if(count<=0){
+            if (count <= 0) {
                 T.showShort(this, "密码错误次数太多,请10分钟后再试");
                 btnConfirm.setEnabled(false);
                 startTimer();
-            }else{
+            } else {
                 T.showShort(this, "密码错误,请重试");
-                tvVerifyTips.setText(String.format(getResources().getString(R.string.verify_tips),count--));
+                tvVerifyTips.setText(String.format(getResources().getString(R.string.verify_tips), count--));
             }
         }
     }
@@ -153,9 +163,9 @@ public class VerifyIdentityActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(seconds>0){
+        if (isLocked) {
             //退出时保存冻结倒计时结束时间
-            PreferenceUtils.putLong(this,Constant.VERIFY_TIME,System.currentTimeMillis()+seconds*1000);
+            PreferenceUtils.putLong(this, Constant.VERIFY_TIME, System.currentTimeMillis() + seconds * 1000);
         }
     }
 }

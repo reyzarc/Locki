@@ -50,6 +50,10 @@ public class SafeguardActivity extends BaseActivity {
             T.showShort(this, "请输入密码");
             return;
         }
+        if (etPwd.getText().toString().length()<6) {
+            T.showShort(this, "密码格式不正确,请重新输入");
+            return;
+        }
         if (TextUtils.isEmpty(etPwdConfirm.getText().toString())) {
             T.showShort(this, "请输入确认密码");
             return;
