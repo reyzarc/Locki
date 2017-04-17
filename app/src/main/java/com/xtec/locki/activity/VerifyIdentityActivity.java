@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
+import com.xtec.locki.utils.DateUtils;
+import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
 
@@ -42,7 +44,7 @@ public class VerifyIdentityActivity extends BaseActivity {
     TextView tvVerifyTips;
     //密码验证次数
     private int count = 3;
-    //锁定时间
+    //锁定时间,单位秒
     private int seconds = 600;
     private Timer timer;
 
@@ -53,7 +55,7 @@ public class VerifyIdentityActivity extends BaseActivity {
                 case 1:
                     seconds--;
                     if (seconds != 0) {
-                        tvVerifyTips.setText(String.format(getResources().getString(R.string.verify_time),seconds));
+                        tvVerifyTips.setText(String.format(getResources().getString(R.string.verify_time), DateUtils.FormatStringTimeMS(seconds)));
                     } else {
                         btnConfirm.setEnabled(true);
                     }
@@ -74,11 +76,22 @@ public class VerifyIdentityActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        int time = PreferenceUtils.getInt(this,Constant.VERIFY_TIME);
-        if(time>0){
+        long time = PreferenceUtils.getLong(this,Constant.VERIFY_TIME);
+        long difTime = time-System.currentTimeMillis();
+        L.e("reyzarc",time+"时间差是----->"+difTime+"秒=====>"+difTime/1000);
+        if(difTime > 0){//还未过冻结时间
             btnConfirm.setEnabled(false);
-            seconds = time;
+            seconds = (int) (difTime/1000);
             startTimer();
+        }else{//已经过了冻结时间
+            btnConfirm.setEnabled(true);
+            seconds = 600;
+            count = 3;
+            if(timer!=null){
+                timer.cancel();
+                timer = null;
+            }
+            tvVerifyTips.setText("请输入密码验证身份");
         }
     }
 
@@ -141,7 +154,8 @@ public class VerifyIdentityActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         if(seconds>0){
-            PreferenceUtils.putInt(this,Constant.VERIFY_TIME,seconds);
+            //退出时保存冻结倒计时结束时间
+            PreferenceUtils.putLong(this,Constant.VERIFY_TIME,System.currentTimeMillis()+seconds*1000);
         }
     }
 }

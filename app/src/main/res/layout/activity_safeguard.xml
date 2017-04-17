@@ -77,11 +77,18 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textSize="12sp"
+        android:text="此密码用于每次打开本应用(不是锁定的应用),都需要验证密码,确保只有机主本人才可以更改已加锁列表等设置,保护用户隐私."/>
+
 
     <Button
         android:id="@+id/btn_confirm"
         style="@style/orange_btn_style"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:text="设置"/>
 
 </LinearLayout>

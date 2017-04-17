@@ -68,7 +68,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     private List<String> mLockList = new ArrayList<>();
     private boolean hasList;
 
-    private FastDialog mDialog;
+    private FastDialog mServiceEnableDialog;
+    private FastDialog mDeviceManageDialog;
     private Gson mGson;
     private final int REQUEST_GESTURE = 1;
     private final int REQUEST_NUMBER = 2;
@@ -156,7 +157,10 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     }
 
     private void showEnableDialog() {
-        new FastDialog(this)
+        if (mDeviceManageDialog != null && mDeviceManageDialog.isShowing()) {
+            return;
+        }
+        mDeviceManageDialog  =  new FastDialog(this)
                 .setTitle("激活设备管理器")
                 .setContent("使用锁屏需要激活设备管理器功能,请按提示操作")
                 .setNegativeButton("取消", new FastDialog.OnClickListener() {
@@ -172,7 +176,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                         i.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);//注册系统组件
                         startActivity(i);
                     }
-                }).create().show();
+                }).create();
+        mDeviceManageDialog.show();
     }
 
     @Override
@@ -194,10 +199,10 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
     private void checkServiceEnable() {
         if (!AppUtil.isAccessibilitySettingsOn(this, LockService.class)) {
-            if (mDialog != null && mDialog.isShowing()) {
+            if (mServiceEnableDialog != null && mServiceEnableDialog.isShowing()) {
                 return;
             }
-            mDialog = new FastDialog(this)
+            mServiceEnableDialog = new FastDialog(this)
                     .setTitle("提示")
                     .setContent("应用锁需要开启辅助功能才能正常运行,请前往设置->无障碍或者设置->高级->辅助功能中,找到LockService并开启)")
                     .setPositiveButton("前往设置", new FastDialog.OnClickListener() {
@@ -214,7 +219,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                             finish();
                         }
                     }).create();
-            mDialog.show();
+            mServiceEnableDialog.show();
         }
     }
 
