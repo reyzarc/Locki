@@ -403,9 +403,10 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
     @Override
     protected void onStop() {
-        L.e("reyzarc", "=======>" + mLockList.toString());
+        //保存解锁方式
+        PreferenceUtils.putString(this, Constant.LOCK_METHOD, mLockMethod);
+        //保存加锁列表
         String str = mGson.toJson(mLockList);
-        L.e("reyzarc", "数据是---->" + str);
         if (!TextUtils.isEmpty(str)) {
             PreferenceUtils.putString(this, Constant.LOCK_LIST, str);
             sendBroadcast(new Intent(Constant.ACTION_UPDATE_UNLOCK_LIST));
@@ -433,7 +434,6 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                             break;
                         case "success"://成功
                             mLockMethod = Constant.GESTURE;
-                            PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.GESTURE);
                             rbGesturePwd.setChecked(true);
                             break;
                     }
@@ -457,7 +457,6 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                             break;
                         case "success"://成功
                             mLockMethod = Constant.NUMBER;
-                            PreferenceUtils.putString(this, Constant.LOCK_METHOD, Constant.NUMBER);
                             rbNumberPwd.setChecked(true);
                             break;
                     }

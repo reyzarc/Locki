@@ -23,6 +23,7 @@ import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
 import com.xtec.locki.widget.BlurredView;
+import com.xtec.locki.widget.FastDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,8 @@ public class UnlockByNumberActivity extends AppCompatActivity {
     private CancellationSignal mCancellationSignal;
     private Vibrator mVibrator;
 
+    private FastDialog mNoPwdDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +83,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkHasPwd();
         tvTime.setText(DateUtils.FormatStringTimeHM(System.currentTimeMillis()));
         tvDate.setText(DateUtils.getDate(this));
         packageName = PreferenceUtils.getString(this, Constant.PACKAGE_NAME);
@@ -171,7 +175,19 @@ public class UnlockByNumberActivity extends AppCompatActivity {
 
     private void checkPwd(String pwd) {
         L.e("reyzarc", "输入的密码是---->" + pwd);
-        if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
+        if (TextUtils.isEmpty(PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {//未设置数字密码
+            if (TextUtils.equals("1234", pwd)) {
+                //发送认证成功的广播
+                Intent intent = new Intent();
+                intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
+                intent.putExtra(Constant.PACKAGE_NAME, packageName);
+                sendBroadcast(intent);
+                finish();
+                overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
+            } else {
+                T.showShort(this, "初始密码1234,请尽快更改!");
+            }
+        } else if (TextUtils.equals(pwd, PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
             //发送认证成功的广播
             Intent intent = new Intent();
             intent.setAction(Constant.ACTION_UNLOCK_SUCCESS);
@@ -182,6 +198,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
         } else {
             T.showShort(this, "密码错误!");
         }
+        //还原输入状态
         mPwd.setLength(0);
         count = 0;
         checkbox4.setChecked(false);
@@ -288,6 +305,34 @@ public class UnlockByNumberActivity extends AppCompatActivity {
         public void onAuthenticationFailed() {
             super.onAuthenticationFailed();
 //            AndroidUtils.Toast(UnlockByFingerprintAct.this, "指纹认证失败,请重试");
+        }
+    }
+
+    /**
+     * 检查是否设置数字密码
+     */
+    private void checkHasPwd() {
+        if (TextUtils.isEmpty(PreferenceUtils.getString(this, Constant.NUMBER_PASSWORD))) {
+            if (mNoPwdDialog!=null&&mNoPwdDialog.isShowing()){
+                return;
+            }
+            mNoPwdDialog = new FastDialog(this)
+                    .setTitle("警告")
+                    .setContent("检测到您还未设置数字密码,初始密码为1234,请尽快更改数字密码或解锁方式,以保证安全!")
+                    .setNegativeButton("下次再说", new FastDialog.OnClickListener() {
+                        @Override
+                        public void onClick(FastDialog dialog) {
+                            dialog.dismiss();
+                        }
+                    }).setPositiveButton("立即更改", new FastDialog.OnClickListener() {
+                        @Override
+                        public void onClick(FastDialog dialog) {
+                            Intent intent = new Intent();
+                            intent.setClass(UnlockByNumberActivity.this, CreateNumberPwdActivity.class);
+                            startActivity(intent);
+                        }
+                    }).create();
+            mNoPwdDialog.show();
         }
     }
 

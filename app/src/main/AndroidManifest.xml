@@ -72,10 +72,12 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.SafeguardActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateVisible"/>
         <activity
             android:name=".activity.VerifyIdentityActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateVisible"/>
 
         <receiver android:name=".service.DeviceManager"
                   android:permission="android.permission.BIND_DEVICE_ADMIN">
