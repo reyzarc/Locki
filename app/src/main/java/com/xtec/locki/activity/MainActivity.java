@@ -41,6 +41,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.halfbit.pinnedsection.PinnedSectionListView;
 
 public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener, AdapterView.OnItemClickListener {
@@ -61,6 +62,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     Toolbar toolbar;
     @BindView(R.id.mv_state)
     MultiStateView mvState;
+    @BindView(R.id.toolbar_right)
+    TextView toolbarRight;
 
     private List<AppInfo> mListAppInfo = null;
     private PackageManager pm;
@@ -70,6 +73,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
     private FastDialog mServiceEnableDialog;
     private FastDialog mDeviceManageDialog;
+    private FastDialog mTipsDialog;
     private Gson mGson;
     private final int REQUEST_GESTURE = 1;
     private final int REQUEST_NUMBER = 2;
@@ -88,6 +92,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         initToolBar(toolbar, false);
         //判断是否是第一次打开应用,如果是第一次,则引导用户设置保护密码
         if (PreferenceUtils.getBoolean(MainActivity.this, Constant.IS_FIRST, true)) {//第一次
+            showTipsDialog();
             startActivityForResult(new Intent(MainActivity.this, SafeguardActivity.class), REQUEST_SAFEGUARD);
         } else {//不是第一次,则需要验证身份才能进入应用
             startActivityForResult(new Intent(MainActivity.this, VerifyIdentityActivity.class), REQUEST_VERIFY);
@@ -156,6 +161,28 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         lv.setOnItemClickListener(this);
     }
 
+    /**
+     * 加入白名单dialog
+     */
+    private void showTipsDialog() {
+        if (mTipsDialog != null && mTipsDialog.isShowing()) {
+            return;
+        }
+        mTipsDialog = new FastDialog(this)
+                .setTitle("提示")
+                .setContent("为了保证应用锁能正常运行,请在多任务列表和清理软件中手动将本应用锁定(加入应用清理白名单)")
+                .setSingleButton("知道了", new FastDialog.OnClickListener() {
+                    @Override
+                    public void onClick(FastDialog dialog) {
+                        dialog.dismiss();
+                    }
+                }).create();
+        mTipsDialog.show();
+    }
+
+    /**
+     * 设备管理器dialog
+     */
     private void showEnableDialog() {
         if (mDeviceManageDialog != null && mDeviceManageDialog.isShowing()) {
             return;
@@ -492,5 +519,10 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 }
             }
         }
+    }
+
+    @OnClick(R.id.toolbar_right)
+    public void onViewClicked() {
+        showTipsDialog();
     }
 }

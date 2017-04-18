@@ -19,6 +19,17 @@
             android:textColor="@color/white"
             android:textSize="18sp"/>
 
+        <TextView
+            android:id="@+id/toolbar_right"
+            android:layout_marginRight="16dp"
+            android:layout_gravity="right"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:text="帮助" />
+
+
     </android.support.v7.widget.Toolbar>
 
     <com.xtec.locki.widget.MultiStateView
