@@ -87,10 +87,10 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         ButterKnife.bind(this);
         initToolBar(toolbar, false);
         //判断是否是第一次打开应用,如果是第一次,则引导用户设置保护密码
-        if (PreferenceUtils.getBoolean(this, Constant.IS_FIRST, true)) {//第一次
-            startActivityForResult(new Intent(this, SafeguardActivity.class), REQUEST_SAFEGUARD);
+        if (PreferenceUtils.getBoolean(MainActivity.this, Constant.IS_FIRST, true)) {//第一次
+            startActivityForResult(new Intent(MainActivity.this, SafeguardActivity.class), REQUEST_SAFEGUARD);
         } else {//不是第一次,则需要验证身份才能进入应用
-            startActivityForResult(new Intent(this, VerifyIdentityActivity.class), REQUEST_VERIFY);
+            startActivityForResult(new Intent(MainActivity.this, VerifyIdentityActivity.class), REQUEST_VERIFY);
         }
 
         //检查是否激活了设备管理器,防止应用被卸载
@@ -160,7 +160,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         if (mDeviceManageDialog != null && mDeviceManageDialog.isShowing()) {
             return;
         }
-        mDeviceManageDialog  =  new FastDialog(this)
+        mDeviceManageDialog = new FastDialog(this)
                 .setTitle("激活设备管理器")
                 .setContent("使用锁屏需要激活设备管理器功能,请按提示操作")
                 .setNegativeButton("取消", new FastDialog.OnClickListener() {
@@ -471,7 +471,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                             finish();
                             break;
                         case "success"://成功
-                            PreferenceUtils.putBoolean(this,Constant.IS_FIRST,false);
+                            PreferenceUtils.putBoolean(this, Constant.IS_FIRST, false);
                             T.showShort(this, "设置成功");
                             break;
                     }

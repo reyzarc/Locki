@@ -99,8 +99,7 @@ public class LockService extends AccessibilityService {
         if (!PreferenceUtils.getBoolean(this, targetPackage)) {
             PreferenceUtils.putString(this,Constant.PACKAGE_NAME,targetPackage);
             Intent intent = new Intent();
-            intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-            intent.setFlags(FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            intent.setFlags(FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 //            intent.putExtra(Constant.PACKAGE_NAME, targetPackage);
             switch (PreferenceUtils.getString(this, Constant.LOCK_METHOD)) {
                 case Constant.FINGERPRINT://指纹
