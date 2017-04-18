@@ -174,7 +174,7 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
             intent.putExtra(Constant.PACKAGE_NAME, packageName);
             sendBroadcast(intent);
             finish();
-            overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
+            overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
         }
 
         @Override
@@ -202,7 +202,7 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
 
 
         // 初始化一个显示各个点的viewGroup
-        mGestureContentView = new GestureContentView(this, true, "1235789",
+        mGestureContentView = new GestureContentView(this, true, PreferenceUtils.getString(this,Constant.GESTURE_PASSWORD),
                 new GestureDrawline.GestureCallBack() {
 
                     @Override
@@ -220,7 +220,7 @@ public class UnlockByGestureActivity extends AppCompatActivity implements View.O
                         intent.putExtra(Constant.PACKAGE_NAME, packageName);
                         sendBroadcast(intent);
                         finish();
-                        overridePendingTransition(R.anim.enter_hold_view, R.anim.exit_slidedown);
+                        overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
                     }
 
                     @Override

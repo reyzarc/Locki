@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
+import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.widget.gesture.GestureContentView;
 import com.xtec.locki.widget.gesture.GestureDrawline;
@@ -81,6 +82,9 @@ public class CreateGestureActivity extends AppCompatActivity implements View.OnC
                 } else {
                     if (inputCode.equals(mFirstPassword)) {
                         Toast.makeText(CreateGestureActivity.this, "设置成功", Toast.LENGTH_SHORT).show();
+                        L.e("reyzarc","手势密码是---->"+inputCode);
+                        //保存设置的手势
+                        PreferenceUtils.putString(CreateGestureActivity.this,Constant.GESTURE_PASSWORD,inputCode);
                         mGestureContentView.clearDrawlineState(0L);
                         //保存选中的状态
                         PreferenceUtils.putString(CreateGestureActivity.this, Constant.LOCK_METHOD, Constant.GESTURE);
@@ -150,5 +154,4 @@ public class CreateGestureActivity extends AppCompatActivity implements View.OnC
                 break;
         }
     }
-
 }
