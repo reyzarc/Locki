@@ -110,7 +110,6 @@ public class UnlockByNumberActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                L.e("reyzarc", "点击了----->" + mKeysList.get(i).get("num"));
                 if (i == 9) {//无按键
                     return;
                 }
@@ -121,7 +120,9 @@ public class UnlockByNumberActivity extends AppCompatActivity {
                         if (mPwd == null) {
                             return;
                         }
-                        mPwd.substring(0, count % 4);
+                        mPwd =  mPwd.deleteCharAt(count % 4);
+//                        mPwd.substring(0, count % 4);
+                        L.e("reyzarc","psw is ----->"+mPwd);
                         switch (4 - count % 4) {
                             case 1:
                                 checkbox4.setChecked(false);
@@ -144,6 +145,7 @@ public class UnlockByNumberActivity extends AppCompatActivity {
                         }
                     } else {
                         mPwd.setLength(0);
+                        L.e("reyzarc","clean psw is ----->"+mPwd);
                     }
                 } else {
                     count++;
