@@ -117,26 +117,32 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
         //获取之前保存的列表
         String str = PreferenceUtils.getString(this, Constant.LOCK_LIST);
-        if (!TextUtils.isEmpty(str)) {
-            hasList = true;
-            mLockList = mGson.fromJson(str, new TypeToken<List<String>>() {
-            }.getType());
+        L.e("reyzarc", "sfafafafagst is---->" + str);
+        if(!TextUtils.isEmpty(str)){//这里两次判断是因为第一次str必为空,而如果有列表,然后再删除,则str为json字符串[]
+            mLockList = mGson.fromJson(str, new TypeToken<List<String>>() {}.getType());
             L.e("reyzarc", "lock list is---->" + mLockList.toString());
-            //将加锁的列表显示在最前端
-            mListAppInfo.clear();
-            AppInfo appTitle = new AppInfo();
-            appTitle.setAppLabel("已加锁应用");
-            appTitle.setType(AppInfo.SECTION);
-            mListAppInfo.add(appTitle);
-            for (int i = 0; i < mLockList.size(); i++) {
-                ApplicationInfo info = AppUtil.getAppInfoByPackageName(this, mLockList.get(i));
-                if (info != null) {
-                    AppInfo appInfo = getAppInfo(info);
-                    appInfo.setOpened(true);
-                    mListAppInfo.add(appInfo);
+            if (!mLockList.isEmpty()) {
+                hasList = true;
+                //将加锁的列表显示在最前端
+                mListAppInfo.clear();
+                AppInfo appTitle = new AppInfo();
+                appTitle.setAppLabel("已加锁应用");
+                appTitle.setType(AppInfo.SECTION);
+                mListAppInfo.add(appTitle);
+                for (int i = 0; i < mLockList.size(); i++) {
+                    ApplicationInfo info = AppUtil.getAppInfoByPackageName(this, mLockList.get(i));
+                    if (info != null) {
+                        AppInfo appInfo = getAppInfo(info);
+                        appInfo.setOpened(true);
+                        mListAppInfo.add(appInfo);
+                    }
                 }
+            }else{
+                mListAppInfo.clear();
             }
         }
+
+
 
         radioGroup.setOnCheckedChangeListener(this);
         //获取保存的解锁方式,没有保存则默认数字
