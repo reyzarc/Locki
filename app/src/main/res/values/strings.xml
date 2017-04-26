@@ -16,4 +16,7 @@
     <string name="date_and_week">%1$s月%2$s日 星期%3$s</string>
     <string name="verify_tips">验证失败,还剩 %d 次机会</string>
     <string name="verify_time">密码错误次数太多,请 %s 后重试</string>
+    <string name="close">\"关\"</string>
+    <string name="open">\"开\"</string>
+    <string name="copyright">Copyright:Locki@xtech\n2017版权所有</string>
 </resources>

@@ -17,81 +17,145 @@
             android:layout_gravity="center"
             android:text="Locki"
             android:textColor="@color/white"
-            android:textSize="18sp"/>
+            android:textSize="18sp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/toolbar_right"
-            android:layout_marginRight="16dp"
-            android:layout_gravity="right"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="16dp"
+            android:text="帮助"
             android:textColor="@color/white"
-            android:textSize="14sp"
-            android:text="帮助" />
-
-
+            android:textSize="14sp"/>
     </android.support.v7.widget.Toolbar>
 
-    <com.xtec.locki.widget.MultiStateView
-        android:id="@+id/mv_state"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        app:msv_emptyView="@layout/empty_view"
-        app:msv_errorView="@layout/error_view"
-        app:msv_loadingView="@layout/loading_view"
-        app:msv_viewState="loading">
-
-        <LinearLayout
+        android:layout_height="match_parent">
+        <!--content-->
+        <com.xtec.locki.widget.MultiStateView
+            android:id="@+id/mv_state"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_below="@id/toolbar"
+            app:msv_emptyView="@layout/empty_view"
+            app:msv_errorView="@layout/error_view"
+            app:msv_loadingView="@layout/loading_view"
+            app:msv_viewState="loading">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/gray"
-                android:padding="10dp"
-                android:text="解锁方式"
-                android:textColor="@color/white"
-                android:textSize="18sp"/>
-
-            <RadioGroup
-                android:id="@+id/radio_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <RadioButton
-                    android:id="@+id/rb_fingerprint"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="指纹解锁"/>
-
-                <RadioButton
-                    android:id="@+id/rb_gesture_pwd"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="手势密码"/>
-
-                <RadioButton
-                    android:id="@+id/rb_number_pwd"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:checked="true"
-                    android:text="数字密码"/>
-
-            </RadioGroup>
-
-            <de.halfbit.pinnedsection.PinnedSectionListView
-                android:id="@+id/lv"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="@null"/>
-        </LinearLayout>
-    </com.xtec.locki.widget.MultiStateView>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/gray"
+                    android:padding="10dp"
+                    android:text="解锁方式"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"/>
+
+                <RadioGroup
+                    android:id="@+id/radio_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <RadioButton
+                        android:id="@+id/rb_fingerprint"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="指纹解锁"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_gesture_pwd"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="手势密码"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_number_pwd"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="数字密码"/>
+
+                </RadioGroup>
+
+                <de.halfbit.pinnedsection.PinnedSectionListView
+                    android:id="@+id/lv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"/>
+            </LinearLayout>
+        </com.xtec.locki.widget.MultiStateView>
+
+        <!--drawer-->
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:background="@color/white"
+            android:clickable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/rl_modify_app_pwd"
+                    style="@style/row_style"
+                    android:layout_marginTop="16dp">
+
+                    <TextView
+                        style="@style/row_title_style"
+                        android:text="修改应用密码"/>
+
+                    <ImageView
+                        style="@style/row_content_style"
+                        android:src="@drawable/ic_indicate_right_arrow"/>
+                </RelativeLayout>
+
+                <include layout="@layout/gray_divide_line_full"/>
+
+                <RelativeLayout
+                    android:id="@+id/rl_modify_number_pwd"
+                    style="@style/row_style">
+
+                    <TextView
+                        style="@style/row_title_style"
+                        android:text="修改数字密码"/>
+
+                    <ImageView
+                        style="@style/row_content_style"
+                        android:src="@drawable/ic_indicate_right_arrow"/>
+                </RelativeLayout>
+
+                <include layout="@layout/gray_divide_line_full"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray"
+                android:textSize="12sp"
+                android:text="@string/copyright"/>
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

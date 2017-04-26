@@ -12,12 +12,16 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -64,6 +68,12 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     MultiStateView mvState;
     @BindView(R.id.toolbar_right)
     TextView toolbarRight;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+    @BindView(R.id.rl_modify_app_pwd)
+    RelativeLayout rlModifyAppPwd;
+    @BindView(R.id.rl_modify_number_pwd)
+    RelativeLayout rlModifyNumberPwd;
 
     private List<AppInfo> mListAppInfo = null;
     private PackageManager pm;
@@ -84,12 +94,33 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     private DevicePolicyManager devicePolicyManager;
     public ComponentName componentName;//权限监听器
 
+    private ActionBarDrawerToggle mDrawerToggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        initToolBar(toolbar, false);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+
+        mDrawerToggle.syncState();
+        drawerLayout.setDrawerListener(mDrawerToggle);
+
+//        initToolBar(toolbar, false);
         //判断是否是第一次打开应用,如果是第一次,则引导用户设置保护密码
         if (PreferenceUtils.getBoolean(MainActivity.this, Constant.IS_FIRST, true)) {//第一次
             showTipsDialog();
@@ -118,8 +149,9 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         //获取之前保存的列表
         String str = PreferenceUtils.getString(this, Constant.LOCK_LIST);
         L.e("reyzarc", "sfafafafagst is---->" + str);
-        if(!TextUtils.isEmpty(str)){//这里两次判断是因为第一次str必为空,而如果有列表,然后再删除,则str为json字符串[]
-            mLockList = mGson.fromJson(str, new TypeToken<List<String>>() {}.getType());
+        if (!TextUtils.isEmpty(str)) {//这里两次判断是因为第一次str必为空,而如果有列表,然后再删除,则str为json字符串[]
+            mLockList = mGson.fromJson(str, new TypeToken<List<String>>() {
+            }.getType());
             L.e("reyzarc", "lock list is---->" + mLockList.toString());
             if (!mLockList.isEmpty()) {
                 hasList = true;
@@ -137,11 +169,10 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                         mListAppInfo.add(appInfo);
                     }
                 }
-            }else{
+            } else {
                 mListAppInfo.clear();
             }
         }
-
 
 
         radioGroup.setOnCheckedChangeListener(this);
@@ -527,8 +558,20 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         }
     }
 
-    @OnClick(R.id.toolbar_right)
-    public void onViewClicked() {
-        showTipsDialog();
+    @OnClick({R.id.toolbar_right, R.id.rl_modify_app_pwd, R.id.rl_modify_number_pwd})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.toolbar_right://帮助
+                showTipsDialog();
+                break;
+            case R.id.rl_modify_app_pwd://修改app验证密码
+                drawerLayout.closeDrawer(Gravity.START);
+                startActivity(new Intent(this, SafeguardActivity.class));
+                break;
+            case R.id.rl_modify_number_pwd://修改数字密码
+                drawerLayout.closeDrawer(Gravity.START);
+                startActivity(new Intent(this,CreateNumberPwdActivity.class));
+                break;
+        }
     }
 }
