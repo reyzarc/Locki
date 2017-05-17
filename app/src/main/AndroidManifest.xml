@@ -67,15 +67,15 @@
         <activity
             android:name=".activity.CreateNumberPwdActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan|stateVisible"/>
         <activity
             android:name=".activity.SafeguardActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan|stateVisible"/>
         <activity
             android:name=".activity.VerifyIdentityActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan|stateVisible"/>
 
         <activity
             android:name=".activity.TimePlanActivity"
