@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -18,6 +17,7 @@ import com.xtec.locki.utils.DateUtils;
 import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
+import com.xtec.locki.widget.Topbar;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,16 +32,15 @@ import butterknife.OnClick;
  */
 
 public class VerifyIdentityActivity extends BaseActivity {
-    @BindView(R.id.toolbar_title)
-    TextView toolbarTitle;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+
     @BindView(R.id.et_pwd)
     EditText etPwd;
     @BindView(R.id.btn_confirm)
     Button btnConfirm;
     @BindView(R.id.tv_verify_tips)
     TextView tvVerifyTips;
+    @BindView(R.id.topbar)
+    Topbar topbar;
     //密码验证次数
     private int count = 3;
     private boolean isLocked;
@@ -72,7 +71,8 @@ public class VerifyIdentityActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_identity);
         ButterKnife.bind(this);
-        initToolBar(toolbar, true);
+        initTopbar(this, topbar);
+        getSwipeBackLayout().setEnableGesture(false);
     }
 
     @Override

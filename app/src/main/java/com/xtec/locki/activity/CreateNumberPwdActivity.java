@@ -3,17 +3,16 @@ package com.xtec.locki.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
 import com.xtec.locki.widget.PayPwdEditText;
+import com.xtec.locki.widget.Topbar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,23 +25,21 @@ import butterknife.OnClick;
 
 public class CreateNumberPwdActivity extends BaseActivity {
 
-    @BindView(R.id.toolbar_title)
-    TextView toolbarTitle;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
     @BindView(R.id.password)
     PayPwdEditText password;
     @BindView(R.id.password_confirm)
     PayPwdEditText passwordConfirm;
     @BindView(R.id.btn_submit)
     Button btnSubmit;
+    @BindView(R.id.topbar)
+    Topbar topbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_number_password);
         ButterKnife.bind(this);
-        initToolBar(toolbar, true);
+        initTopbar(this, topbar);
         initView();
     }
 

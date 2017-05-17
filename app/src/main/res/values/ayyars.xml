@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="google_colors">
+        <item>@color/colorPrimary</item>
+        <item>@color/colorPrimary</item>
+        <item>@color/colorPrimary</item>
+        <item>@color/colorPrimary</item>
+    </integer-array>
+
+
+    <string-array name="questions">
+        <item>你父亲的姓名是？</item>
+        <item>你的学号（或工号）是？</item>
+        <item>你母亲的姓名是？</item>
+        <item>你家乡的地址是？</item>
+        <item>你中学的班主任是？</item>
+        <item>我爱人的生日是什么？</item>
+        <item>我初中学校校名是什么？</item>
+        <item>我爱人的名字是什么？</item>
+        <item>自定义问题</item>
+    </string-array>
+
+</resources>

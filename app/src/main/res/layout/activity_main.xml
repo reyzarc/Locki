@@ -142,6 +142,21 @@
                 </RelativeLayout>
 
                 <include layout="@layout/gray_divide_line_full"/>
+
+                <RelativeLayout
+                    android:id="@+id/rl_add_plan"
+                    style="@style/row_style">
+
+                    <TextView
+                        style="@style/row_title_style"
+                        android:text="时间规划"/>
+
+                    <ImageView
+                        style="@style/row_content_style"
+                        android:src="@drawable/ic_indicate_right_arrow"/>
+                </RelativeLayout>
+
+                <include layout="@layout/gray_divide_line_full"/>
             </LinearLayout>
 
             <TextView

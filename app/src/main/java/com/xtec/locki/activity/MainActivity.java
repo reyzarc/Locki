@@ -74,6 +74,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     RelativeLayout rlModifyAppPwd;
     @BindView(R.id.rl_modify_number_pwd)
     RelativeLayout rlModifyNumberPwd;
+    @BindView(R.id.rl_add_plan)
+    RelativeLayout rlAddPlan;
 
     private List<AppInfo> mListAppInfo = null;
     private PackageManager pm;
@@ -104,6 +106,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSwipeBackLayout().setEnableGesture(false);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close) {
             @Override
@@ -558,7 +561,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         }
     }
 
-    @OnClick({R.id.toolbar_right, R.id.rl_modify_app_pwd, R.id.rl_modify_number_pwd})
+    @OnClick({R.id.rl_add_plan,R.id.toolbar_right, R.id.rl_modify_app_pwd, R.id.rl_modify_number_pwd})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.toolbar_right://帮助
@@ -570,7 +573,11 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 break;
             case R.id.rl_modify_number_pwd://修改数字密码
                 drawerLayout.closeDrawer(Gravity.START);
-                startActivity(new Intent(this,CreateNumberPwdActivity.class));
+                startActivity(new Intent(this, CreateNumberPwdActivity.class));
+                break;
+            case R.id.rl_add_plan://添加计划
+                drawerLayout.closeDrawer(Gravity.START);
+                startActivity(new Intent(this, TimePlanActivity.class));
                 break;
         }
     }

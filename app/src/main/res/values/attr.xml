@@ -17,4 +17,19 @@
         </attr>
         <attr name="msv_animateViewChanges" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="Topbar">
+        <attr name="topbar_height" format="dimension"/>
+        <attr name="topbar_color" format="color"/>
+        <attr name="back_enable" format="boolean"/>
+        <attr name="left_icon" format="reference"/>
+        <attr name="right_icon" format="reference"/>
+        <attr name="topbar_transparent" format="boolean"/>
+        <attr name="left_text" format="string"/>
+        <attr name="right_text" format="string"/>
+        <attr name="title" format="string"/>
+        <attr name="title_color" format="color"/>
+    </declare-styleable>
+
+    <attr name="SwipeBackLayoutStyle" format="reference"/>
 </resources>

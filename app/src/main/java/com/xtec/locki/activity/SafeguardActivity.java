@@ -3,17 +3,16 @@ package com.xtec.locki.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
+import com.xtec.locki.widget.Topbar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,23 +24,22 @@ import butterknife.OnClick;
  */
 
 public class SafeguardActivity extends BaseActivity {
-    @BindView(R.id.toolbar_title)
-    TextView toolbarTitle;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+
     @BindView(R.id.et_pwd)
     EditText etPwd;
     @BindView(R.id.et_pwd_confirm)
     EditText etPwdConfirm;
     @BindView(R.id.btn_confirm)
     Button btnConfirm;
+    @BindView(R.id.topbar)
+    Topbar topbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_safeguard);
         ButterKnife.bind(this);
-        initToolBar(toolbar,true);
+        initTopbar(this, topbar);
     }
 
     @OnClick(R.id.btn_confirm)
@@ -50,7 +48,7 @@ public class SafeguardActivity extends BaseActivity {
             T.showShort(this, "请输入密码");
             return;
         }
-        if (etPwd.getText().toString().length()<6) {
+        if (etPwd.getText().toString().length() < 6) {
             T.showShort(this, "密码格式不正确,请重新输入");
             return;
         }
