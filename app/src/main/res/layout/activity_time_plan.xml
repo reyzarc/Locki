@@ -10,4 +10,32 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:title="时间计划"/>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/bankcards_dashed"
+            android:gravity="center"
+            android:text="您还没有添加任何计划\n请点击右下角按钮添加" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:divider="@drawable/dividing_ine"
+        android:dividerHeight="8dp"
+        android:listSelector="#00000000"
+        />
+
 </LinearLayout>

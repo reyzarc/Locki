@@ -26,4 +26,14 @@
     <color name="color999999">#999999</color>
     <color name="gray_bg">#f0f0f0</color>
     <color name="translucent">#1effffff</color>
+    <color name="yellow">#f2b366</color>
+    <color name="red">#ff0000</color>
+
+    <color name="btn_theme_green">#FF7BC128</color>
+    <color name="btn_theme_green_pressed">#817bc128</color>
+
+    <color name="btn_theme_yellow">#F46D0A</color>
+    <color name="btn_theme_yellow_pressed">#DA5A0B</color>
+    <color name="red_pressed">#cbe62929</color>
+    <color name="red_normal">#FFE62929</color>
 </resources>

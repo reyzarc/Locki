@@ -5,12 +5,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
+import android.provider.Settings;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.xtec.locki.Constant;
+import com.xtec.locki.activity.DialogActivity;
 import com.xtec.locki.activity.UnlockByFingerprintActivity;
 import com.xtec.locki.activity.UnlockByGestureActivity;
 import com.xtec.locki.activity.UnlockByNumberActivity;
@@ -19,9 +25,12 @@ import com.xtec.locki.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NO_USER_ACTION;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICKED;
 
@@ -51,6 +60,12 @@ public class LockService extends AccessibilityService {
 //    private String[] mFilterPackage = new String[]{"com.google.android.googlequicksearchbox", "com.android.systemui", "com.xtec.locki", "com.cyou.privacysecurity"};
     private String[] mFilterPackage = new String[]{ "com.xtec.locki","com.google.android.inputmethod.pinyin","com.android.systemui","com.iflytek.inputmethod","com.google.android.packageinstaller"};
     private List<String> mLockList = new ArrayList<>();
+
+    // 定义浮动窗口布局
+    LinearLayout mFloatLayout;
+    WindowManager.LayoutParams wmParams;
+    // 创建浮动窗口设置布局参数的对象
+    WindowManager mWindowManager;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -140,6 +155,98 @@ public class LockService extends AccessibilityService {
         /* 注册机器锁屏时的广播 */
         IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
         registerReceiver(mScreenOReceiver, mScreenOffFilter);
+
+//        checkWindowPermission();
+
+//        //创建悬浮窗
+//        createFloatView();
+
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                createFloatView();
+            }
+        },0,5000);
+
+    }
+
+
+    //以悬浮窗的形式显示dialog,没有阴影,遂放弃
+    private void checkWindowPermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if(!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                startActivity(intent);
+                return;
+            } else {
+                //绘ui代码, 这里说明6.0系统已经有权限了
+                createFloatView();
+            }
+        } else {
+            //绘ui代码,这里android6.0以下的系统直接绘出即可
+            createFloatView();
+        }
+    }
+
+    private void createFloatView() {
+
+        Intent intent = new Intent(this,DialogActivity.class);
+        intent.setFlags(FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_USER_ACTION);
+        startActivity(intent);
+
+
+
+//        wmParams = new WindowManager.LayoutParams();
+//        // 设置window type 下面变量2002是在屏幕区域显示，2003则可以显示在状态栏之上
+//        // wmParams.type = LayoutParams.TYPE_PHONE;
+//        // wmParams.type = LayoutParams.TYPE_SYSTEM_ALERT;
+//        wmParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
+//        // 设置图片格式，效果为背景透明
+//        wmParams.format = PixelFormat.RGBA_8888;
+//        // 设置浮动窗口不可聚焦（实现操作除浮动窗口外的其他可见窗口的操作）
+//        // wmParams.flags = LayoutParams.FLAG_NOT_FOCUSABLE;
+//        // 设置可以显示在状态栏上
+//        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+//                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+//                | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+//
+//
+//
+//
+//        // 悬浮窗默认显示以左上角为起始坐标
+//        wmParams.gravity = Gravity.CENTER;
+//
+//        // 以屏幕右上角为原点，设置x、y初始值，确定显示窗口的起始位置
+//        wmParams.x = 0;
+//        wmParams.y = 0;
+//        mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+//
+//        // 设置悬浮窗口长宽数据
+//        wmParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+////        wmParams.width = (int) (mWindowManager.getDefaultDisplay().getWidth()*0.8);
+//        wmParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+//
+//        LayoutInflater inflater = LayoutInflater.from(this);
+//        // 获取浮动窗口视图所在布局
+//        mFloatLayout = (LinearLayout) inflater.inflate(R.layout.floating_view, null);
+//        // 添加悬浮窗的视图
+//        mWindowManager.addView(mFloatLayout, wmParams);
+
+        /**
+         * 设置悬浮窗的点击、滑动事件
+         */
+//        ImageButton sampleFloat = (ImageButton) mFloatLayout.findViewById(R.id.float_button_id);
+
+//        /**
+//         * 设置有无反馈
+//         */
+//        MyOnGestureListener listener = new MyOnGestureListener();
+//        @SuppressWarnings("deprecation")
+//        final GestureDetector mGestureDetector = new GestureDetector(listener);
+//        sampleFloat.setOnTouchListener(new MyOnTouchListener(mGestureDetector));
+
     }
 
     private void getLockList() {
@@ -211,4 +318,102 @@ public class LockService extends AccessibilityService {
         return false;
     }
 
+
+//    /**
+//     * @author:Jack Tony
+//     * @tips  :设置触摸监听器，处理触摸的事件
+//     * @date  :2014-8-13
+//     */
+//    private class MyOnTouchListener implements View.OnTouchListener {
+//        private GestureDetector mGestureDetector;
+//
+//        public MyOnTouchListener(GestureDetector mGestureDetector) {
+//            this.mGestureDetector = mGestureDetector;
+//        }
+//
+//        @Override
+//        public boolean onTouch(View v, MotionEvent event) {
+//
+//                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//                    v.setBackgroundColor(Color.parseColor("#ffd060"));
+//                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+//
+//                }else if(event.getAction()==MotionEvent.ACTION_MOVE){
+//                    moveViewWithFinger(v,event.getRawX(), event.getRawY());
+//                }
+//
+//
+//            return mGestureDetector.onTouchEvent(event);
+//        }
+//    }
+
+    /**
+     * 设置View的布局属性，使得view随着手指移动 注意：view所在的布局必须使用RelativeLayout 而且不得设置居中等样式
+     *
+     * @param view
+     * @param rawX
+     * @param rawY
+     */
+    private void moveViewWithFinger(View view, float rawX, float rawY) {
+        int left = (int) (rawX - view.getWidth() / 2);
+        int top = (int) (rawY  - view.getHeight() / 2);
+        int width = left + view.getWidth();
+        int height = top + view.getHeight();
+        view.layout(left, top, width, height);
+    }
+
+//    /**
+//     * @author:金凯
+//     * @tips :自己定义的手势监听类，设置悬浮窗上下左右滑动、双击的动作
+//     * @date :2014-3-29
+//     */
+//    class MyOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+//
+//
+//        @Override
+//        public boolean onDoubleTap(MotionEvent e) {
+//            T.showShort(LockService.this,"双击啦...");
+//            return false;
+//        }
+//
+//        @Override
+//        public void onLongPress(MotionEvent e) {
+//            super.onLongPress(e);
+//            T.showShort(LockService.this,"长按");
+//        }
+//
+//        @Override
+//        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+//                               float velocityY) {
+//
+//            int dy = (int) (e2.getY() - e1.getY()); // 计算滑动的距离,纵向操作
+//            int dx = (int) (e2.getX() - e1.getX());
+//
+//            if (dy < -20 && Math.abs(velocityY) > Math.abs(velocityX)) {
+//                Log.i("sample", "向上");
+//            }
+//
+//            if (dy > 20 && Math.abs(velocityY) > Math.abs(velocityX)) {
+//                Log.i("sample", "向下");
+//            }
+//
+//            if (dx > 20 && Math.abs(velocityX) > Math.abs(velocityY)) {
+//                Log.i("sample", "向右");
+//            }
+//            if (dx < -20 && Math.abs(velocityX) > Math.abs(velocityY)) {
+//                Log.i("sample", "向左");
+//
+//
+//            }
+//            return false;
+//        }
+//
+//    }
+
+    @Override
+    public int onStartCommand(Intent intent,  int flags, int startId) {
+        createFloatView();
+
+        return super.onStartCommand(intent, flags, startId);
+    }
 }

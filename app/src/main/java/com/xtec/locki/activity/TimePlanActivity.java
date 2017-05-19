@@ -2,9 +2,19 @@ package com.xtec.locki.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.xtec.locki.R;
+import com.xtec.locki.adapter.PlanListAdapter;
+import com.xtec.locki.model.PlanInfoModel;
+import com.xtec.locki.utils.T;
 import com.xtec.locki.widget.Topbar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,12 +32,53 @@ public class TimePlanActivity extends BaseActivity {
 
     @BindView(R.id.topbar)
     Topbar topbar;
+    @BindView(R.id.ll_no_data)
+    LinearLayout llNoData;
+    @BindView(R.id.lv_list)
+    ListView lvList;
+
+    private List<PlanInfoModel> mPlanList;
+    private PlanListAdapter mAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_plan);
         ButterKnife.bind(this);
-        initTopbar(this,topbar);
+        initTopbar(this, topbar);
+        initView();
+        initData();
+    }
+
+    private void initData() {
+        //获取计划列表
+//        String str = "";
+//        mPlanList = new Gson().fromJson(str,new TypeToken<List<PlanInfoModel>>(){}.getType());
+        mPlanList = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            PlanInfoModel model = new PlanInfoModel();
+            model.setDuration(""+100*i);
+            model.setPlanTitle("跑步"+i);
+            model.setStartTime("18:00");
+            mPlanList.add(model);
+        }
+
+        if (!mPlanList.isEmpty()) {
+            mAdapter.setData(mPlanList);
+        }
+    }
+
+    private void initView() {
+
+        mAdapter = new PlanListAdapter(this);
+        lvList.setAdapter(mAdapter);
+
+        lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {//跳转到编辑银行卡界面
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                T.showShort(TimePlanActivity.this,"点击了第..."+position);
+
+            }
+        });
     }
 }

@@ -5,6 +5,10 @@
     <uses-permission android:name="android.permission.GET_TASKS"/>
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- 悬浮窗的权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- 启动辅助服务的权限 -->
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
 
     <application
         android:name=".MyApplication"
@@ -64,6 +68,13 @@
         <activity
             android:name=".activity.CreateGestureActivity"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activity.DialogActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/DialogTheme"
+            android:launchMode="singleInstance"/>
         <activity
             android:name=".activity.CreateNumberPwdActivity"
             android:screenOrientation="portrait"
