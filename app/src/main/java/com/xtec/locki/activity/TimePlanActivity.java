@@ -1,16 +1,17 @@
 package com.xtec.locki.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.xtec.locki.R;
 import com.xtec.locki.adapter.PlanListAdapter;
 import com.xtec.locki.model.PlanInfoModel;
-import com.xtec.locki.utils.T;
 import com.xtec.locki.widget.Topbar;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by 武昌丶鱼 on 2017/5/17.
@@ -36,6 +38,8 @@ public class TimePlanActivity extends BaseActivity {
     LinearLayout llNoData;
     @BindView(R.id.lv_list)
     ListView lvList;
+    @BindView(R.id.btn_add_plan)
+    Button btnAddPlan;
 
     private List<PlanInfoModel> mPlanList;
     private PlanListAdapter mAdapter;
@@ -57,8 +61,8 @@ public class TimePlanActivity extends BaseActivity {
         mPlanList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             PlanInfoModel model = new PlanInfoModel();
-            model.setDuration(""+100*i);
-            model.setPlanTitle("跑步"+i);
+            model.setDuration("" + 100 * i);
+            model.setPlanTitle("跑步" + i);
             model.setStartTime("18:00");
             mPlanList.add(model);
         }
@@ -76,9 +80,18 @@ public class TimePlanActivity extends BaseActivity {
         lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {//跳转到编辑银行卡界面
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                T.showShort(TimePlanActivity.this,"点击了第..."+position);
+
+
+                startActivity(new Intent(TimePlanActivity.this,PlanDetailActivity.class));
 
             }
         });
+    }
+
+    @OnClick(R.id.btn_add_plan)
+    public void onViewClicked() {
+        Intent intent = new Intent(this,PlanDetailActivity.class);
+        intent.putExtra("flag","add");
+        startActivity(intent);
     }
 }

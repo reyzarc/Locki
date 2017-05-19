@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <com.xtec.locki.widget.Topbar
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:title="计划详情"/>
+
+    <RelativeLayout
+        android:layout_marginTop="16dp"
+        android:id="@+id/rl_plan_type"
+        style="@style/row_style">
+
+        <TextView
+            style="@style/row_title_style"
+            android:text="类别"/>
+
+        <TextView
+            android:drawablePadding="8dp"
+            android:drawableRight="@drawable/ic_indicate_right_arrow"
+            android:id="@+id/tv_type"
+            style="@style/row_content_style"
+            tools:text="跑步"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_marginTop="16dp"
+        android:id="@+id/rl_start_time"
+        style="@style/row_style">
+
+        <TextView
+            style="@style/row_title_style"
+            android:text="开始时间"/>
+
+        <TextView
+            android:drawablePadding="8dp"
+            android:drawableRight="@drawable/ic_indicate_right_arrow"
+            android:id="@+id/tv_start_time"
+            style="@style/row_content_style"
+            tools:text="18:00"/>
+    </RelativeLayout>
+
+    <include
+        layout="@layout/gray_divide_line_full"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_duration"
+        style="@style/row_style">
+
+        <TextView
+            style="@style/row_title_style"
+            android:text="持续时间"/>
+
+        <TextView
+            android:drawablePadding="8dp"
+            android:drawableRight="@drawable/ic_indicate_right_arrow"
+            android:id="@+id/tv_duration"
+            style="@style/row_content_style"
+            tools:text="1小时30分"/>
+    </RelativeLayout>
+    <include
+        layout="@layout/gray_divide_line_full"/>
+    <RelativeLayout
+        android:id="@+id/rl_repeat"
+        style="@style/row_style">
+
+        <TextView
+            style="@style/row_title_style"
+            android:text="是否重复"/>
+
+        <TextView
+            android:drawablePadding="8dp"
+            android:drawableRight="@drawable/ic_indicate_right_arrow"
+            android:id="@+id/tv_repeat"
+            style="@style/row_content_style"
+            tools:text="每周"/>
+    </RelativeLayout>
+
+    <Button
+        android:layout_marginTop="40dp"
+        android:id="@+id/btn_confirm"
+        style="@style/orange_btn_style"
+        android:text="确定"/>
+
+</LinearLayout>

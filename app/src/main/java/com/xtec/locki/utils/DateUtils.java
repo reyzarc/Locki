@@ -96,4 +96,24 @@ public class DateUtils {
         }
         return "";
     }
+
+    /**
+     * 返回月日时分
+     * @param date
+     * @return
+     */
+    public static String getMDHM(Date date) {//可根据需要自行截取数据显示
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm");
+        return format.format(date);
+    }
+
+    /**
+     * 返回时分
+     * @param date
+     * @return
+     */
+    public static String getHM(Date date) {//可根据需要自行截取数据显示
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        return format.format(date);
+    }
 }

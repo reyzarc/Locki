@@ -82,4 +82,5 @@ dependencies {
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
+    compile 'com.contrarywind:Android-PickerView:3.2.5'
 }

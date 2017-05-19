@@ -28,14 +28,27 @@
             android:text="您还没有添加任何计划\n请点击右下角按钮添加" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lv_list"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:divider="@drawable/dividing_ine"
-        android:dividerHeight="8dp"
-        android:listSelector="#00000000"
-        />
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/lv_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:divider="@drawable/dividing_ine"
+            android:dividerHeight="8dp"
+            android:listSelector="#00000000"/>
 
+        <Button
+            android:id="@+id/btn_add_plan"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/ic_arc_menu"/>
+
+    </RelativeLayout>
 </LinearLayout>

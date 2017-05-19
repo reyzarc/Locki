@@ -168,7 +168,7 @@ public class LockService extends AccessibilityService {
             public void run() {
                 createFloatView();
             }
-        },0,5000);
+        },0,50000);
 
     }
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="plan_type">
+        <item>跑步</item>
+        <item>健走</item>
+        <item>练字</item>
+        <item>英语</item>
+        <item>看书</item>
+    </string-array>
+
+    <string-array name="repeat_type">
+        <item>每天</item>
+        <item>每周</item>
+        <item>每月</item>
+    </string-array>
+
+    <string-array name="duration_hour">
+        <item>00</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+    </string-array>
+</resources>
