@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
-
+    <!--侧滑出的布局-->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -29,42 +29,130 @@
             android:text="删除"
             android:textColor="@color/white"/>
     </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+    <!--显示的布局-->
     <LinearLayout
-        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="80dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="练字"
-            android:textColor="@color/colorPrimary"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_marginLeft="20dp">
 
-        <TextView
-            android:id="@+id/tv_start_time"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="18:00开始"
-            android:textSize="16sp"/>
 
-        <TextView
-            android:id="@+id/tv_duration"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="持续1小时20分"
-            android:textSize="16sp"/>
+            <View
+                android:id="@+id/header"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|center"
+                android:background="@drawable/dash_line_vertical"
+                android:layerType="software"
+                />
+
+            <View
+                android:id="@+id/footer"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="bottom|center"
+                android:background="@drawable/dash_line_vertical"
+                android:layerType="software"
+                />
+            <!-- <View
+                 android:id="@+id/both"
+                 android:layout_width="1dp"
+                 android:layout_height="match_parent"
+                 android:layout_gravity="center"
+                 android:background="@color/gray_bg"
+                 />-->
+
+            <!--<ImageView
+                android:id="@+id/iv_dot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_orange_dot"/>-->
+
+            <ImageView
+                android:id="@+id/iv_dot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/dot_green"/>
+
+        </FrameLayout>
+
+        <!--<LinearLayout-->
+            <!--android:gravity="center"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:padding="16dp">-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_title"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="练字"-->
+                <!--android:textColor="@color/colorPrimary"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_start_time"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="18:00开始"-->
+                <!--android:textSize="16sp"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_duration"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:text="持续1小时20分"-->
+                <!--android:textSize="16sp"/>-->
+        <!--</LinearLayout>-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_title"
+                    style="@style/TextSmallBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="跑步"/>
+
+                <TextView
+                    android:id="@+id/tv_start_time"
+                    android:textColor="@color/gray_text_color"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="开始时间:02-27 11:20"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="持续时间:1小时20分"
+                android:textColor="@color/gray_text_color"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
     </LinearLayout>
-
-    </FrameLayout>
 </com.daimajia.swipe.SwipeLayout>

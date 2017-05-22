@@ -83,4 +83,5 @@ dependencies {
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'com.contrarywind:Android-PickerView:3.2.5'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 }

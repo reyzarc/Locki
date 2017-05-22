@@ -9,6 +9,7 @@
     </string-array>
 
     <string-array name="repeat_type">
+        <item>仅一次</item>
         <item>每天</item>
         <item>每周</item>
         <item>每月</item>

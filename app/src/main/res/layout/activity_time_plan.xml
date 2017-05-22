@@ -36,8 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
-            android:divider="@drawable/dividing_ine"
-            android:dividerHeight="8dp"
+            android:divider="@null"
             android:listSelector="#00000000"/>
 
         <Button

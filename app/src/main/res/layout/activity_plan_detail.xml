@@ -11,6 +11,23 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:title="计划详情"/>
+    <RelativeLayout
+        android:layout_marginTop="16dp"
+        android:id="@+id/rl_plan_title"
+        style="@style/row_style">
+
+        <TextView
+            style="@style/row_title_style"
+            android:text="标题"/>
+        <EditText
+            android:id="@+id/et_title"
+            android:gravity="right|center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/row_content_style"
+            android:background="@null"/>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_marginTop="16dp"

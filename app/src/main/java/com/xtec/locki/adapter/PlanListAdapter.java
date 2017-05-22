@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
@@ -37,7 +38,7 @@ public class PlanListAdapter extends BaseSwipeAdapter {
         if (list == null) {
             return;
         }
-        mList.addAll(list);
+        mList.addAll(0, list);
         notifyDataSetChanged();
     }
 
@@ -78,23 +79,64 @@ public class PlanListAdapter extends BaseSwipeAdapter {
         TextView tvStatus = (TextView) convertView.findViewById(R.id.tv_status);
         TextView tvDelete = (TextView) convertView.findViewById(R.id.tv_delete);
 
+        View header = convertView.findViewById(R.id.header);
+        View footer = convertView.findViewById(R.id.footer);
+        ImageView ivDot = (ImageView) convertView.findViewById(R.id.iv_dot);
+
         PlanInfoModel model = mList.get(position);
+
+        if (mList.size() == 1) {//只有一条数据
+            header.setVisibility(View.GONE);
+            footer.setVisibility(View.GONE);
+        } else {
+            if (position == 0) {//第一条数据
+                ivDot.setImageResource(R.drawable.dot_orange);
+                header.setVisibility(View.GONE);
+                footer.setVisibility(View.VISIBLE);
+            } else if (position == mList.size() - 1) {//最后一条数据
+                ivDot.setImageResource(R.drawable.dot_gray);
+                footer.setVisibility(View.GONE);
+                header.setVisibility(View.VISIBLE);
+            } else {
+                ivDot.setImageResource(R.drawable.dot_gray);
+                footer.setVisibility(View.VISIBLE);
+                header.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if(position==0){
+            if(model!=null&&model.getStatus()!=null){
+                switch (model.getStatus()){
+                    case "0"://暂停
+                        ivDot.setImageResource(R.drawable.dot_orange);
+                        break;
+                    case "1"://执行
+                        ivDot.setImageResource(R.drawable.dot_green);
+                        break;
+                    case "2"://放弃
+                        ivDot.setImageResource(R.drawable.dot_red);
+                        break;
+                }
+            }
+        }
+
+
         if (model != null) {
             tvTitle.setText(model.getPlanTitle());
-            tvDuration.setText("持续时间:"+model.getDuration()+"分钟");
-            tvStartTime.setText("开始时间:"+model.getStartTime());
+            tvDuration.setText("持续时间:" + model.getDuration() + "分钟");
+            tvStartTime.setText("开始时间:" + model.getStartTime());
 
             tvDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    T.showShort(mContext,position+"被删除了");
+                    T.showShort(mContext, position + "被删除了");
                 }
             });
 
             tvStatus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    T.showShort(mContext,"暂停or继续");
+                    T.showShort(mContext, "暂停or继续");
                 }
             });
         }

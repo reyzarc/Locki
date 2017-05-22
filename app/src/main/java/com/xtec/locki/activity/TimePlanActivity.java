@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.xtec.locki.R;
 import com.xtec.locki.adapter.PlanListAdapter;
 import com.xtec.locki.model.PlanInfoModel;
+import com.xtec.locki.utils.RxBus;
 import com.xtec.locki.widget.Topbar;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by 武昌丶鱼 on 2017/5/17.
@@ -52,6 +55,23 @@ public class TimePlanActivity extends BaseActivity {
         initTopbar(this, topbar);
         initView();
         initData();
+        initRxBus();
+    }
+
+    private void initRxBus() {
+        Subscription subscribe = RxBus.getInstance().toObservable(PlanInfoModel.class)
+                .subscribe(new Action1<PlanInfoModel>() {
+                    @Override
+                    public void call(PlanInfoModel planInfoModel) {
+                        if (planInfoModel != null) {
+
+                            List<PlanInfoModel> list = new ArrayList<>();
+                            list.add(0,planInfoModel);
+                            mAdapter.addData(list);
+                        }
+                    }
+                });
+        addSubscription(subscribe);
     }
 
     private void initData() {

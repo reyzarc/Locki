@@ -3,4 +3,5 @@
     <dimen name="dialog_radius">8dp</dimen>
     <dimen name="btn_radius">150dp</dimen>
     <dimen name="topbar_padding">10dp</dimen>
+    <dimen name="dot_size">16dp</dimen>
 </resources>

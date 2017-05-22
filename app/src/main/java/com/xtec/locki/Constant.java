@@ -77,4 +77,9 @@ public class Constant {
      * 账户错误后锁定时间
      */
     public static final String VERIFY_TIME = "verify_time";
+
+    /**
+     * 单条记录计划
+     */
+    public static final String PLAN_SINGLE_RECORD = "plan_single_record";
 }

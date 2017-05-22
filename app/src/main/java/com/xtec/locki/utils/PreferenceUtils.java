@@ -8,6 +8,8 @@ package com.xtec.locki.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+
 import static android.content.Context.MODE_MULTI_PROCESS;
 
 /**
@@ -117,15 +119,15 @@ public  class PreferenceUtils {
 //        return settings.getBoolean(key, defaultValue);
 //    }
 //
-//    public static void putObject(Context context,String key,Object object){
-//        String str = new Gson().toJson(object);
-//        putString(context,key,str);
-//    }
-//
-//    public static <T>T getObject(Context context,String key,Class<T> clazz){
-//
-//        return new Gson().fromJson(getString(context,key),clazz);
-//    }
+    public static void putObject(Context context,String key,Object object){
+        String str = new Gson().toJson(object);
+        putString(context,key,str);
+    }
+
+    public static <T>T getObject(Context context,String key,Class<T> clazz){
+
+        return new Gson().fromJson(getString(context,key),clazz);
+    }
 
     public static boolean putString(Context context, String key, String value) {
         SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, MODE_MULTI_PROCESS);

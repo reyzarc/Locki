@@ -17,6 +17,9 @@ import com.xtec.locki.utils.UIUtils;
 import com.xtec.locki.widget.swipeBackLayout.SwipeBackActivity;
 import com.xtec.locki.widget.swipeBackLayout.SwipeBackLayout;
 
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
+
 /**
  * Created by 武昌丶鱼 on 2017/4/13.
  * Description:
@@ -25,6 +28,7 @@ import com.xtec.locki.widget.swipeBackLayout.SwipeBackLayout;
 public class BaseActivity extends SwipeBackActivity {
 
     protected ProgressDialog mProgressDialog;
+    private CompositeSubscription mCompositeSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,7 @@ public class BaseActivity extends SwipeBackActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unsubscribe();
         if(mProgressDialog!=null){
             mProgressDialog.dismiss();
         }
@@ -174,6 +179,20 @@ public class BaseActivity extends SwipeBackActivity {
             InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             im.hideSoftInputFromWindow(token,
                     InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    public void addSubscription(Subscription s) {
+        if (this.mCompositeSubscription == null) {
+            this.mCompositeSubscription = new CompositeSubscription();
+        }
+        this.mCompositeSubscription.add(s);
+    }
+
+
+    public void unsubscribe(){
+        if (this.mCompositeSubscription != null) {
+            this.mCompositeSubscription.unsubscribe();
         }
     }
 }

@@ -1,16 +1,23 @@
 package com.xtec.locki.activity;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
+import com.xtec.locki.Constant;
 import com.xtec.locki.R;
+import com.xtec.locki.model.PlanInfoModel;
 import com.xtec.locki.utils.DateUtils;
+import com.xtec.locki.utils.PreferenceUtils;
+import com.xtec.locki.utils.RxBus;
+import com.xtec.locki.utils.T;
 import com.xtec.locki.widget.Topbar;
 
 import java.util.ArrayList;
@@ -49,6 +56,10 @@ public class PlanDetailActivity extends BaseActivity {
     RelativeLayout rlRepeat;
     @BindView(R.id.btn_confirm)
     Button btnConfirm;
+    @BindView(R.id.et_title)
+    EditText etTitle;
+    @BindView(R.id.rl_plan_title)
+    RelativeLayout rlPlanTitle;
 
     private String flag;
     private List<String> planType;
@@ -154,8 +165,56 @@ public class PlanDetailActivity extends BaseActivity {
                 pickerView2.show();
                 break;
             case R.id.btn_confirm://确定
+                if(TextUtils.isEmpty(etTitle.getText())){
+                    T.showShort(this,"请填写标题");
+                    return;
+                }
 
+                if (TextUtils.isEmpty(tvType.getText())) {
+                    T.showShort(this, "请选择类别");
+                    return;
+                }
 
+                if (TextUtils.isEmpty(tvStartTime.getText())) {
+                    T.showShort(this, "请选择开始时间");
+                    return;
+                }
+
+                if (TextUtils.isEmpty(tvDuration.getText())) {
+                    T.showShort(this, "请选择持续时间");
+                    return;
+                }
+
+                if (TextUtils.isEmpty(tvRepeat.getText())) {
+                    T.showShort(this, "请选择重复周期");
+                    return;
+                }
+
+                PlanInfoModel model = new PlanInfoModel();
+                model.setType(tvType.getText().toString().trim());
+                model.setStartTime(tvStartTime.getText().toString().trim());
+                model.setDuration(tvDuration.getText().toString().trim());
+                model.setRepeat(tvRepeat.getText().toString().trim());
+                model.setPlanTitle(etTitle.getText().toString());
+                model.setStatus("0");
+
+                PreferenceUtils.putObject(this, Constant.PLAN_SINGLE_RECORD,model);
+                RxBus.getInstance().postEvent(model);
+                getProgressDialog().setMessage("处理中...");
+                getProgressDialog().show();
+                CountDownTimer timer = new CountDownTimer(3000,1000) {
+                    @Override
+                    public void onTick(long l) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        getProgressDialog().dismiss();
+                        finish();
+                    }
+                };
+                timer.start();
                 break;
         }
     }

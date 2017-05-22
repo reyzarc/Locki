@@ -36,4 +36,5 @@
     <color name="btn_theme_yellow_pressed">#DA5A0B</color>
     <color name="red_pressed">#cbe62929</color>
     <color name="red_normal">#FFE62929</color>
+    <color name="gray_text_color">#929292</color>
 </resources>
