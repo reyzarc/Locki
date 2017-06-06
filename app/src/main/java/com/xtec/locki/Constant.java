@@ -82,4 +82,8 @@ public class Constant {
      * 单条记录计划
      */
     public static final String PLAN_SINGLE_RECORD = "plan_single_record";
+    /**
+     * 计划列表key
+     */
+    public static final String PLAN_LIST = "plan_list";
 }

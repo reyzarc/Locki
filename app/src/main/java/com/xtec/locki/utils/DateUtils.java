@@ -1,9 +1,11 @@
 package com.xtec.locki.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.xtec.locki.R;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -115,5 +117,23 @@ public class DateUtils {
     public static String getHM(Date date) {//可根据需要自行截取数据显示
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         return format.format(date);
+    }
+
+    /**
+     * 将06-06 12:25转换成时间戳
+     * @param date
+     * @return
+     */
+    public static long getTimestamp(String date){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String time = String.valueOf(c.get(Calendar.YEAR))+"-"+date;
+        Log.e("reyzarc","-------->"+time);
+        try {
+            return  simpleDateFormat.parse(time).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }

@@ -9,9 +9,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.adapter.PlanListAdapter;
 import com.xtec.locki.model.PlanInfoModel;
+import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.RxBus;
 import com.xtec.locki.widget.Topbar;
 
@@ -66,7 +70,7 @@ public class TimePlanActivity extends BaseActivity {
                         if (planInfoModel != null) {
 
                             List<PlanInfoModel> list = new ArrayList<>();
-                            list.add(0,planInfoModel);
+                            list.add(0, planInfoModel);
                             mAdapter.addData(list);
                         }
                     }
@@ -76,20 +80,21 @@ public class TimePlanActivity extends BaseActivity {
 
     private void initData() {
         //获取计划列表
-//        String str = "";
-//        mPlanList = new Gson().fromJson(str,new TypeToken<List<PlanInfoModel>>(){}.getType());
-        mPlanList = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            PlanInfoModel model = new PlanInfoModel();
-            model.setDuration("" + 100 * i);
-            model.setPlanTitle("跑步" + i);
-            model.setStartTime("18:00");
-            mPlanList.add(model);
+        String str = PreferenceUtils.getString(this, Constant.PLAN_LIST);
+        mPlanList = new Gson().fromJson(str, new TypeToken<List<PlanInfoModel>>() {
+        }.getType());
+        if (mPlanList == null || mPlanList.isEmpty()) {
+            mPlanList = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                PlanInfoModel model = new PlanInfoModel();
+                model.setDuration("" + 100 * i);
+                model.setPlanTitle("跑步" + i);
+                model.setStartTime("0" + (i + 1) + "-05 " + "18:00");
+                model.setStartTime(i-1+"");
+                mPlanList.add(model);
+            }
         }
-
-        if (!mPlanList.isEmpty()) {
-            mAdapter.setData(mPlanList);
-        }
+        mAdapter.setData(mPlanList);
     }
 
     private void initView() {
@@ -102,7 +107,7 @@ public class TimePlanActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 
-                startActivity(new Intent(TimePlanActivity.this,PlanDetailActivity.class));
+                startActivity(new Intent(TimePlanActivity.this, PlanDetailActivity.class));
 
             }
         });
@@ -110,8 +115,8 @@ public class TimePlanActivity extends BaseActivity {
 
     @OnClick(R.id.btn_add_plan)
     public void onViewClicked() {
-        Intent intent = new Intent(this,PlanDetailActivity.class);
-        intent.putExtra("flag","add");
+        Intent intent = new Intent(this, PlanDetailActivity.class);
+        intent.putExtra("flag", "add");
         startActivity(intent);
     }
 }

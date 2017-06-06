@@ -1,6 +1,8 @@
 package com.xtec.locki.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +11,17 @@ import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.google.gson.Gson;
+import com.xtec.locki.Constant;
 import com.xtec.locki.R;
 import com.xtec.locki.model.PlanInfoModel;
+import com.xtec.locki.utils.DateUtils;
+import com.xtec.locki.utils.PreferenceUtils;
 import com.xtec.locki.utils.T;
+import com.xtec.locki.widget.FastDialog;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -39,7 +48,35 @@ public class PlanListAdapter extends BaseSwipeAdapter {
             return;
         }
         mList.addAll(0, list);
+        sortAndSaveList();
         notifyDataSetChanged();
+    }
+
+    private void sortAndSaveList() {
+        //对列表按照时间从近到远进行排序
+        Collections.sort(mList, new Comparator<PlanInfoModel>() {
+            //返回负数表示t0小于t1,返回0表示相等,返回正数表示t0>t1
+            @Override
+            public int compare(PlanInfoModel t0, PlanInfoModel t1) {
+                //从近到远排序
+                long diff = DateUtils.getTimestamp(t0.getStartTime()) - DateUtils.getTimestamp(t1.getStartTime());
+                Log.e("reyzarc", "diff is ----->" + diff);
+                if (diff > 0) {
+                    return 1;
+                }
+                if (diff == 0) {
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        //保存排序后的列表
+        Gson gson = new Gson();
+        String str = gson.toJson(mList);
+        if (!TextUtils.isEmpty(str)) {
+            PreferenceUtils.putString(mContext, Constant.PLAN_LIST, str);
+        }
     }
 
     @Override
@@ -104,17 +141,28 @@ public class PlanListAdapter extends BaseSwipeAdapter {
             }
         }
 
-        if(position==0){
-            if(model!=null&&model.getStatus()!=null){
-                switch (model.getStatus()){
+        if (position == 0) {
+            if (model != null && model.getStatus() != null) {
+                switch (model.getStatus()) {
+                    case "-1"://未开始
+                        ivDot.setImageResource(R.drawable.dot_gray);
+                        tvStatus.setText("未开始");
+                        tvStatus.setBackgroundColor(mContext.getResources().getColor(R.color.gray));
+                        break;
                     case "0"://暂停
                         ivDot.setImageResource(R.drawable.dot_orange);
+                        tvStatus.setText("暂停中");
+                        tvStatus.setBackgroundColor(mContext.getResources().getColor(R.color.orange_normal));
                         break;
                     case "1"://执行
                         ivDot.setImageResource(R.drawable.dot_green);
+                        tvStatus.setText("进行中");
+                        tvStatus.setBackgroundColor(mContext.getResources().getColor(R.color.btn_theme_green));
                         break;
                     case "2"://放弃
                         ivDot.setImageResource(R.drawable.dot_red);
+                        tvStatus.setText("已放弃");
+                        tvStatus.setBackgroundColor(mContext.getResources().getColor(R.color.red));
                         break;
                 }
             }
@@ -129,7 +177,22 @@ public class PlanListAdapter extends BaseSwipeAdapter {
             tvDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    T.showShort(mContext, position + "被删除了");
+                    new FastDialog(mContext)
+                            .setTitle("提醒")
+                            .setContent("确定删除这条计划?")
+                            .setPositiveButton("确定", new FastDialog.OnClickListener() {
+                                @Override
+                                public void onClick(FastDialog dialog) {
+                                    mList.remove(position);
+                                    notifyDataSetChanged();
+                                }
+                            })
+                            .setNegativeButton("取消", new FastDialog.OnClickListener() {
+                                @Override
+                                public void onClick(FastDialog dialog) {
+                                    dialog.dismiss();
+                                }
+                            }).create().show();
                 }
             });
 

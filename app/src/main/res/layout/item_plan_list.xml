@@ -15,9 +15,9 @@
             android:id="@+id/tv_status"
             android:layout_width="72dp"
             android:layout_height="match_parent"
-            android:background="@color/yellow"
+            android:background="@color/gray"
             android:gravity="center"
-            android:text="暂停中"
+            android:text="未开始"
             android:textColor="@color/white"/>
 
         <TextView
