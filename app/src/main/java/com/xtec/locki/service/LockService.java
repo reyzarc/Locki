@@ -20,6 +20,8 @@ import com.xtec.locki.activity.DialogActivity;
 import com.xtec.locki.activity.UnlockByFingerprintActivity;
 import com.xtec.locki.activity.UnlockByGestureActivity;
 import com.xtec.locki.activity.UnlockByNumberActivity;
+import com.xtec.locki.model.PlanInfoModel;
+import com.xtec.locki.utils.DateUtils;
 import com.xtec.locki.utils.L;
 import com.xtec.locki.utils.PreferenceUtils;
 
@@ -66,6 +68,8 @@ public class LockService extends AccessibilityService {
     WindowManager.LayoutParams wmParams;
     // 创建浮动窗口设置布局参数的对象
     WindowManager mWindowManager;
+
+    private List<PlanInfoModel> mPlanList;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -146,6 +150,7 @@ public class LockService extends AccessibilityService {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constant.ACTION_UNLOCK_SUCCESS);
         filter.addAction(Constant.ACTION_UPDATE_UNLOCK_LIST);
+        filter.addAction(Constant.ACTION_UPDATE_PLAN_STATUS);
         mReceiver = new MyBroadcastReceiver();
         registerReceiver(mReceiver, filter);
 
@@ -161,15 +166,40 @@ public class LockService extends AccessibilityService {
 //        //创建悬浮窗
 //        createFloatView();
 
+        
+        //定时任务,每30s检查是否有活动需要提示
+
         Timer timer = new Timer();
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                createFloatView();
+                checkHasPlanToStart();
+//                createFloatView();
             }
-        },0,1000*60*10);
+        },0,1000*30);
 
+    }
+
+    private void checkHasPlanToStart() {
+        //获取计划列表
+        String str = PreferenceUtils.getString(this, Constant.PLAN_LIST);
+        mPlanList = new Gson().fromJson(str, new TypeToken<List<PlanInfoModel>>() {
+        }.getType());
+        
+        if (!mPlanList.isEmpty()){
+            for (int i = 0; i < mPlanList.size(); i++) {
+                PlanInfoModel model = mPlanList.get(i);
+                //如果当前有计划需要执行并且计划还没开始/没有被删除/暂停
+                long diff = DateUtils.getTimestamp(model.getStartTime()) - System.currentTimeMillis();
+                if (diff>=0&&diff<=60*1000) {
+                    if(TextUtils.equals("1",model.getStatus())||TextUtils.equals("2",model.getStatus())){
+                        return;
+                    }
+                    createFloatView(model);
+                }
+            }
+        }
     }
 
 
@@ -182,18 +212,19 @@ public class LockService extends AccessibilityService {
                 return;
             } else {
                 //绘ui代码, 这里说明6.0系统已经有权限了
-                createFloatView();
+//                createFloatView(model);
             }
         } else {
             //绘ui代码,这里android6.0以下的系统直接绘出即可
-            createFloatView();
+//            createFloatView(model);
         }
     }
 
-    private void createFloatView() {
+    private void createFloatView(PlanInfoModel model) {
 
         Intent intent = new Intent(this,DialogActivity.class);
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_NO_USER_ACTION);
+        intent.putExtra("model",model);
         startActivity(intent);
 
 
@@ -270,6 +301,8 @@ public class LockService extends AccessibilityService {
                 PreferenceUtils.putLong(LockService.this,packageName+"time", System.currentTimeMillis());
             } else if (!TextUtils.isEmpty(action) && TextUtils.equals(action, Constant.ACTION_UPDATE_UNLOCK_LIST)) {//更新加锁列表
                 getLockList();
+            }else if (!TextUtils.isEmpty(action) && TextUtils.equals(action, Constant.ACTION_UPDATE_PLAN_STATUS)) {//更新计划状态
+
             }
         }
     }
@@ -412,7 +445,7 @@ public class LockService extends AccessibilityService {
 
     @Override
     public int onStartCommand(Intent intent,  int flags, int startId) {
-        createFloatView();
+//        createFloatView(model);
 
         return super.onStartCommand(intent, flags, startId);
     }

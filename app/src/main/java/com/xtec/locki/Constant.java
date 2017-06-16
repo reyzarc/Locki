@@ -86,4 +86,8 @@ public class Constant {
      * 计划列表key
      */
     public static final String PLAN_LIST = "plan_list";
+    /**
+     * 更新计划状态
+     */
+    public static final String ACTION_UPDATE_PLAN_STATUS = "action_update_plan_status";
 }

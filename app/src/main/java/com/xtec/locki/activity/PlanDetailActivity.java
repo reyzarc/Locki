@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -197,6 +198,7 @@ public class PlanDetailActivity extends BaseActivity {
                 model.setRepeat(tvRepeat.getText().toString().trim());
                 model.setPlanTitle(etTitle.getText().toString());
                 model.setStatus("0");
+                model.setId(UUID.randomUUID().toString());
 
                 PreferenceUtils.putObject(this, Constant.PLAN_SINGLE_RECORD,model);
                 RxBus.getInstance().postEvent(model);

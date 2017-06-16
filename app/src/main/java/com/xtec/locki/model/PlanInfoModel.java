@@ -1,11 +1,19 @@
 package com.xtec.locki.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by 武昌丶鱼 on 2017/5/17.
  * Description:
  */
 
-public class PlanInfoModel {
+public class PlanInfoModel implements Parcelable {
+
+    /**
+     * id
+     */
+    private String id;
 
     /**
      * 类别
@@ -33,6 +41,14 @@ public class PlanInfoModel {
      */
 
     private String repeat;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getType() {
         return type;
@@ -93,4 +109,43 @@ public class PlanInfoModel {
                 ", repeat='" + repeat + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.type);
+        dest.writeString(this.planTitle);
+        dest.writeString(this.duration);
+        dest.writeString(this.startTime);
+        dest.writeString(this.status);
+        dest.writeString(this.repeat);
+    }
+
+    public PlanInfoModel() {
+    }
+
+    protected PlanInfoModel(Parcel in) {
+        this.type = in.readString();
+        this.planTitle = in.readString();
+        this.duration = in.readString();
+        this.startTime = in.readString();
+        this.status = in.readString();
+        this.repeat = in.readString();
+    }
+
+    public static final Parcelable.Creator<PlanInfoModel> CREATOR = new Parcelable.Creator<PlanInfoModel>() {
+        @Override
+        public PlanInfoModel createFromParcel(Parcel source) {
+            return new PlanInfoModel(source);
+        }
+
+        @Override
+        public PlanInfoModel[] newArray(int size) {
+            return new PlanInfoModel[size];
+        }
+    };
 }

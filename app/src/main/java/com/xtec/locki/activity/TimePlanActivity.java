@@ -1,6 +1,9 @@
 package com.xtec.locki.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -21,6 +24,7 @@ import com.xtec.locki.widget.Topbar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +54,7 @@ public class TimePlanActivity extends BaseActivity {
 
     private List<PlanInfoModel> mPlanList;
     private PlanListAdapter mAdapter;
+    private MyBroadcastReceiver myReceiver;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,6 +65,26 @@ public class TimePlanActivity extends BaseActivity {
         initView();
         initData();
         initRxBus();
+        registerBroadReceiver();
+    }
+
+    private void registerBroadReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constant.ACTION_UPDATE_PLAN_STATUS);
+        myReceiver = new MyBroadcastReceiver();
+        registerReceiver(myReceiver,filter);
+    }
+
+    private class MyBroadcastReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()){
+                case Constant.ACTION_UPDATE_PLAN_STATUS:
+                    initData();
+                    break;
+            }
+        }
     }
 
     private void initRxBus() {
@@ -87,6 +112,7 @@ public class TimePlanActivity extends BaseActivity {
             mPlanList = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 PlanInfoModel model = new PlanInfoModel();
+                model.setId(UUID.randomUUID().toString());
                 model.setDuration("" + 100 * i);
                 model.setPlanTitle("跑步" + i);
                 model.setStartTime("0" + (i + 1) + "-05 " + "18:00");
@@ -118,5 +144,11 @@ public class TimePlanActivity extends BaseActivity {
         Intent intent = new Intent(this, PlanDetailActivity.class);
         intent.putExtra("flag", "add");
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(myReceiver);
     }
 }

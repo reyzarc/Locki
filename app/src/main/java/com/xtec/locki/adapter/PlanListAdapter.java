@@ -22,6 +22,7 @@ import com.xtec.locki.widget.FastDialog;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -71,9 +72,18 @@ public class PlanListAdapter extends BaseSwipeAdapter {
             }
         });
 
+        Iterator<PlanInfoModel> it = mList.iterator();
+        while (it.hasNext()) {
+            PlanInfoModel model = it.next();
+            if (DateUtils.getTimestamp(model.getStartTime()) < System.currentTimeMillis()) {
+                it.remove();
+            }
+        }
+
         //保存排序后的列表
         Gson gson = new Gson();
         String str = gson.toJson(mList);
+        Log.e("reyzarc","最终的数据是0----->"+str);
         if (!TextUtils.isEmpty(str)) {
             PreferenceUtils.putString(mContext, Constant.PLAN_LIST, str);
         }
