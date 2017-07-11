@@ -91,7 +91,7 @@
             <View
                 android:layout_width="0.2dp"
                 android:layout_height="45dp"
-                android:background="@drawable/home_line"/>
+                android:background="@color/gray"/>
 
             <TextView
                 android:id="@+id/tv_confirm"

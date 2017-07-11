@@ -122,7 +122,8 @@ public class GestureDrawline extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		if (isDrawEnable == false) {
 			// 当期不允许绘制
-			return true;
+//			return true;
+			return false;
 		}
 		paint.setColor(Color.rgb(245, 142, 33));// 设置默认连线颜色
 		switch (event.getAction()) {

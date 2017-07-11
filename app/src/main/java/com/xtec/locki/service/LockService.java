@@ -69,7 +69,7 @@ public class LockService extends AccessibilityService {
     // 创建浮动窗口设置布局参数的对象
     WindowManager mWindowManager;
 
-    private List<PlanInfoModel> mPlanList;
+    private List<PlanInfoModel> mPlanList = new ArrayList<>();
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -186,7 +186,10 @@ public class LockService extends AccessibilityService {
         String str = PreferenceUtils.getString(this, Constant.PLAN_LIST);
         mPlanList = new Gson().fromJson(str, new TypeToken<List<PlanInfoModel>>() {
         }.getType());
-        
+        if (mPlanList == null) {
+            return;
+        }
+
         if (!mPlanList.isEmpty()){
             for (int i = 0; i < mPlanList.size(); i++) {
                 PlanInfoModel model = mPlanList.get(i);
